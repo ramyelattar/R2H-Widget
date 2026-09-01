@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item component="ComponentInfo{com.google.android.dialer/com.google.android.dialer.extensions.GoogleDialtactsActivity}" drawable="r2h_darkglass_phone" />
+    <item component="ComponentInfo{com.google.android.apps.messaging/com.google.android.apps.messaging.ui.ConversationListActivity}" drawable="r2h_darkglass_messages" />
+    <item component="ComponentInfo{com.nothing.camera/com.nothing.camera.activity.CameraActivity}" drawable="r2h_darkglass_camera" />
+    <item component="ComponentInfo{com.nothing.gallery/com.nothing.gallery.activity.EntryActivity}" drawable="r2h_darkglass_gallery" />
+    <item component="ComponentInfo{com.android.settings/com.android.settings.Settings}" drawable="r2h_darkglass_settings" />
+    <item component="ComponentInfo{com.nothing.weather/com.nothing.weather.ui.main.MainActivity}" drawable="r2h_darkglass_weather" />
+    <item component="ComponentInfo{com.google.android.apps.nbu.files/com.google.android.apps.nbu.files.home.HomeActivity}" drawable="r2h_darkglass_files" />
+    <item component="ComponentInfo{com.google.android.deskclock/com.android.deskclock.DeskClock}" drawable="r2h_darkglass_clock" />
+    <item component="ComponentInfo{com.google.android.calendar/com.android.calendar.AllInOneActivity}" drawable="r2h_darkglass_calendar" />
+    <item component="ComponentInfo{com.hearthborn.studios.ncalc/com.hearthborn.studios.ncalc.MainActivity}" drawable="r2h_darkglass_calculator" />
+    <item component="ComponentInfo{com.android.chrome/com.google.android.apps.chrome.Main}" drawable="r2h_darkglass_chrome" />
+    <item component="ComponentInfo{com.google.android.contacts/com.android.contacts.activities.PeopleActivity}" drawable="r2h_darkglass_contacts" />
+    <item component="ComponentInfo{com.google.android.apps.maps/com.google.android.maps.MapsActivity}" drawable="r2h_darkglass_maps" />
+    <item component="ComponentInfo{com.metrolist.music/com.metrolist.music.MainActivityAlias}" drawable="r2h_darkglass_music" />
+    <item component="ComponentInfo{com.google.android.gm/com.google.android.gm.ConversationListActivityGmail}" drawable="r2h_darkglass_gmail" />
+    <item component="ComponentInfo{com.google.android.apps.docs/com.google.android.apps.docs.app.NewMainProxyActivity}" drawable="r2h_darkglass_drive" />
+    <item component="ComponentInfo{com.android.vending/com.android.vending.AssetBrowserActivity}" drawable="r2h_darkglass_playstore" />
+    <item component="ComponentInfo{com.google.android.youtube/com.google.android.youtube.app.honeycomb.Shell$HomeActivity}" drawable="r2h_darkglass_youtube" />
+    <item component="ComponentInfo{com.openai.chatgpt/com.openai.chatgpt.MainActivity}" drawable="r2h_darkglass_chatgpt" />
+    <item component="ComponentInfo{com.whatsapp/com.whatsapp.AppIcon05}" drawable="r2h_darkglass_whatsapp" />
+    <item component="ComponentInfo{com.instagram.android/com.instagram.android.activity.MainTabActivity}" drawable="r2h_darkglass_instagram" />
+    <item component="ComponentInfo{com.facebook.katana/com.facebook.katana.LoginActivity}" drawable="r2h_darkglass_facebook" />
+    <item component="ComponentInfo{com.zhiliaoapp.musically/com.ss.android.ugc.aweme.splash.SplashActivity}" drawable="r2h_darkglass_tiktok" />
+    <item component="ComponentInfo{com.twitter.android/com.x.android.main.MainActivity}" drawable="r2h_darkglass_x" />
+    <item component="ComponentInfo{ir.ilmili.telegraph/org.telegram.messenger.DefaultIcon}" drawable="r2h_darkglass_telegram" />
+</resources>

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">R2H-Widget</string>
+    <string name="widget_digital_clock_label">Digital Clock</string>
+    <string name="widget_analog_clock_label">Analog Clock</string>
+    <string name="widget_battery_label">Battery</string>
+    <string name="widget_weather_label">Weather</string>
+    <string name="widget_search_label">Search</string>
+    <string name="widget_calendar_legacy_label">Date</string>
+    <string name="widget_music_label">Music Player</string>
+</resources>
+

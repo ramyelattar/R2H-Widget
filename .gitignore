@@ -1,0 +1,54 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# IDE / local tooling
+.idea/
+.kotlin/
+.mimosa/
+
+# Generated/audit output
+audit-output/
+
+# Local archives and handoff bundles
+*.zip
+
+# Crash / replay logs
+hs_err_pid*.log
+replay_pid*.log
+
+# Local scan reports
+_portfolio_scan.md
+
+# Excluded packaged/integration folders
+R2H_4_ICON_PACKS_FINAL_COMPLETE/
+R2H_4_ICON_PACKS_PHASE1_COMPLETE/
+R2H_Customization_4_Packs_Complete/
+r2h_fluffy_customization_integration/
+
+# Excluded project documentation / helper scripts
+ARCHITECTURE.md
+BUILD_INSTALL_FINAL_R2H_ICONPACKS.ps1
+FIX_AND_VERIFY_FINAL_ICONPACK_INSTALLER.ps1
+FIX_SIGN_BUILD_INSTALL_FINAL_R2H_ICONPACKS.ps1
+collect-customization-current.ps1
+collect-r2h-iconpack-chatgpt-handoff-SLIM.ps1
+collect-r2h-iconpack-chatgpt-handoff.ps1
+diagnose-iconpack-installer-test.ps1
+docs/
+fix-r2h-fluffy-clip-and-build.ps1
+tools/
+
+**/build/

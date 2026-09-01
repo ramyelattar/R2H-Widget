@@ -1,0 +1,3632 @@
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\catalog\WidgetCatalog.kt ================
+
+package com.r2h_widget.catalog
+
+/**
+ * The user-facing catalog: exactly one base widget per section.
+ *
+ * Digital and analog clocks share the Clock category; everything a user could want
+ * from the removed preset products is a studio control on these five definitions.
+ */
+object WidgetCatalog {
+    val categories: List<WidgetCategory> = listOf(
+        WidgetCategory.ALL,
+        WidgetCategory.CLOCK,
+        WidgetCategory.BATTERY,
+        WidgetCategory.WEATHER,
+        WidgetCategory.SEARCH,
+    )
+
+    val digitalClock = WidgetDefinition(
+        id = WidgetProductIds.DIGITAL_CLOCK,
+        displayName = "Digital Clock",
+        description = "Big readable time with date, fonts, and colors you control.",
+        category = WidgetCategory.CLOCK,
+        size = WidgetSize.TWO_BY_ONE,
+        premiumState = PremiumState.FREE,
+        rendererKey = WidgetPreviewRendererRegistry.DIGITAL_CLOCK,
+        previewAccentHex = "#A78BFA",
+        homeWidgetAvailability = HomeWidgetAvailability.DIGITAL_CLOCK,
+    )
+
+    val analogClock = WidgetDefinition(
+        id = WidgetProductIds.ANALOG_CLOCK,
+        displayName = "Analog Clock",
+        description = "A classic dial with markers, hands, and a cap you can restyle.",
+        category = WidgetCategory.CLOCK,
+        size = WidgetSize.TWO_BY_TWO,
+        premiumState = PremiumState.FREE,
+        rendererKey = WidgetPreviewRendererRegistry.ANALOG_CLOCK,
+        previewAccentHex = "#38BDF8",
+        homeWidgetAvailability = HomeWidgetAvailability.ANALOG_CLOCK,
+    )
+
+    val battery = WidgetDefinition(
+        id = WidgetProductIds.BATTERY,
+        displayName = "Battery",
+        description = "Live level, charging state, and colors driven by your device.",
+        category = WidgetCategory.BATTERY,
+        size = WidgetSize.TWO_BY_ONE,
+        premiumState = PremiumState.FREE,
+        rendererKey = WidgetPreviewRendererRegistry.BATTERY,
+        previewAccentHex = "#34D399",
+        homeWidgetAvailability = HomeWidgetAvailability.BATTERY,
+    )
+
+    val weather = WidgetDefinition(
+        id = WidgetProductIds.WEATHER,
+        displayName = "Weather",
+        description = "Temperature, condition, and place once a weather source is connected.",
+        category = WidgetCategory.WEATHER,
+        size = WidgetSize.TWO_BY_TWO,
+        premiumState = PremiumState.FREE,
+        rendererKey = WidgetPreviewRendererRegistry.WEATHER,
+        previewAccentHex = "#7DD3FC",
+        homeWidgetAvailability = HomeWidgetAvailability.WEATHER,
+    )
+
+    val search = WidgetDefinition(
+        id = WidgetProductIds.SEARCH,
+        displayName = "Search",
+        description = "A home-screen search bar that opens your search app in one tap.",
+        category = WidgetCategory.SEARCH,
+        size = WidgetSize.FOUR_BY_TWO,
+        premiumState = PremiumState.FREE,
+        rendererKey = WidgetPreviewRendererRegistry.SEARCH,
+        previewAccentHex = "#B69CFF",
+        homeWidgetAvailability = HomeWidgetAvailability.SEARCH,
+    )
+
+    val all: List<WidgetDefinition> = listOf(digitalClock, analogClock, battery, weather, search)
+
+    fun forCategory(category: WidgetCategory): List<WidgetDefinition> = when (category) {
+        WidgetCategory.ALL -> all
+        else -> all.filter { it.category == category }
+    }
+
+    fun findById(id: String): WidgetDefinition? = all.firstOrNull { it.id == WidgetProductIds.canonicalize(id) }
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\catalog\WidgetModels.kt ================
+
+package com.r2h_widget.catalog
+
+enum class WidgetCategory(val label: String) {
+    ALL("All"),
+    CLOCK("Clock"),
+    BATTERY("Battery"),
+    WEATHER("Weather"),
+    SEARCH("Search"),
+}
+
+enum class WidgetSize(val label: String) {
+    TWO_BY_ONE("2 x 1"),
+    TWO_BY_TWO("2 x 2"),
+    FOUR_BY_TWO("4 x 2"),
+}
+
+enum class PremiumState {
+    FREE,
+    PRO,
+}
+
+/** Which real launcher provider backs a catalog product. */
+enum class HomeWidgetAvailability {
+    NONE,
+    DIGITAL_CLOCK,
+    ANALOG_CLOCK,
+    BATTERY,
+    WEATHER,
+    SEARCH,
+}
+
+data class WidgetDefinition(
+    val id: String,
+    val displayName: String,
+    val description: String,
+    val category: WidgetCategory,
+    val size: WidgetSize,
+    val premiumState: PremiumState = PremiumState.FREE,
+    val rendererKey: String,
+    val previewAccentHex: String = "#8B5CF6",
+    val homeWidgetAvailability: HomeWidgetAvailability = HomeWidgetAvailability.NONE,
+)
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\catalog\WidgetPreviewRendererRegistry.kt ================
+
+package com.r2h_widget.catalog
+
+object WidgetPreviewRendererRegistry {
+    const val DIGITAL_CLOCK = "digital_clock"
+    const val ANALOG_CLOCK = "analog_clock"
+    const val BATTERY = "battery"
+    const val WEATHER = "weather"
+    const val SEARCH = "search"
+    const val FALLBACK = "fallback"
+
+    fun resolve(rendererKey: String): String = when (rendererKey) {
+        DIGITAL_CLOCK -> DIGITAL_CLOCK
+        ANALOG_CLOCK -> ANALOG_CLOCK
+        BATTERY -> BATTERY
+        WEATHER -> WEATHER
+        SEARCH -> SEARCH
+        else -> FALLBACK
+    }
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\catalog\WidgetProductIds.kt ================
+
+package com.r2h_widget.catalog
+
+/**
+ * Stable product IDs for the simplified catalog: one base widget per section.
+ *
+ * Anything a user can customize is a control inside the studio, never a separate
+ * catalog entry. Legacy preset IDs are folded into these canonical products.
+ */
+object WidgetProductIds {
+    const val DIGITAL_CLOCK = "digital-clock"
+    const val ANALOG_CLOCK = "analog-clock"
+    const val BATTERY = "battery"
+    const val WEATHER = "weather"
+    const val SEARCH = "search"
+
+    /**
+     * Legacy products that may still exist as pinned home-screen widgets or stored
+     * records. They are not offered in the catalog anymore.
+     */
+    const val LEGACY_CALENDAR = "calendar-foundation"
+
+    /**
+     * Maps every historical product ID onto the current canonical product.
+     * `clock-01` .. `clock-10` were cosmetic digital clock presets; each collapses
+     * into the single Digital Clock product with its configuration preserved.
+     */
+    fun canonicalize(productId: String): String = when {
+        productId.startsWith("clock-") -> DIGITAL_CLOCK
+        productId == "battery-foundation" -> BATTERY
+        productId == "weather-foundation" -> WEATHER
+        else -> productId
+    }
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\data\TypedWidgetInstanceRepository.kt ================
+
+package com.r2h_widget.data
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.r2h_widget.catalog.WidgetProductIds
+import com.r2h_widget.widget.analog.AnalogClockConfiguration
+import com.r2h_widget.widget.analog.AnalogCapStyle
+import com.r2h_widget.widget.analog.AnalogMarkerStyle
+import com.r2h_widget.widget.analog.AnalogNumberStyle
+import com.r2h_widget.widget.battery.BatteryWidgetConfiguration
+import com.r2h_widget.widget.battery.BatteryWidgetLayout
+import com.r2h_widget.widget.calendar.CalendarWidgetConfiguration
+import com.r2h_widget.widget.clock.ClockDateAlignment
+import com.r2h_widget.widget.clock.ClockDateConfiguration
+import com.r2h_widget.widget.clock.ClockDateFormatPreset
+import com.r2h_widget.widget.clock.ClockDatePlacement
+import com.r2h_widget.widget.clock.ClockFontFamily
+import com.r2h_widget.widget.clock.ClockMonthStyle
+import com.r2h_widget.widget.clock.ClockWeekdayStyle
+import com.r2h_widget.widget.clock.ClockYearStyle
+import com.r2h_widget.widget.common.WidgetActionConfiguration
+import com.r2h_widget.widget.common.WidgetActionType
+import com.r2h_widget.widget.common.WidgetBackgroundConfiguration
+import com.r2h_widget.widget.common.WidgetBackgroundFill
+import com.r2h_widget.widget.common.WidgetBackgroundShape
+import com.r2h_widget.widget.search.SearchTapAction
+import com.r2h_widget.widget.search.SearchTarget
+import com.r2h_widget.widget.search.SearchWidgetConfiguration
+import com.r2h_widget.widget.weather.WeatherUnits
+import com.r2h_widget.widget.weather.WeatherWidgetConfiguration
+import com.r2h_widget.widget.weather.WeatherWidgetLayout
+import kotlinx.coroutines.flow.first
+
+/**
+ * Persisted configuration for every widget family that is not the digital clock.
+ * One record per launcher appWidgetId, holding the canonical product ID and the
+ * fully typed studio configuration.
+ */
+sealed interface TypedWidgetConfiguration {
+    data class Battery(val value: BatteryWidgetConfiguration) : TypedWidgetConfiguration
+    data class Weather(val value: WeatherWidgetConfiguration) : TypedWidgetConfiguration
+    data class Analog(val value: AnalogClockConfiguration) : TypedWidgetConfiguration
+    data class Search(val value: SearchWidgetConfiguration) : TypedWidgetConfiguration
+
+    /** Legacy records for calendar widgets pinned before the catalog was simplified. */
+    data class Calendar(val value: CalendarWidgetConfiguration) : TypedWidgetConfiguration
+}
+
+data class TypedWidgetInstance(
+    val appWidgetId: Int,
+    val productId: String,
+    val configuration: TypedWidgetConfiguration,
+)
+
+interface TypedWidgetInstanceRepository {
+    suspend fun get(appWidgetId: Int): TypedWidgetInstance?
+
+    suspend fun save(instance: TypedWidgetInstance)
+
+    suspend fun delete(appWidgetId: Int)
+}
+
+object TypedWidgetInstanceCodec {
+    private const val PREFIX = "#!"
+    private const val CURRENT_VERSION = "2"
+    private const val LEGACY_VERSION = "1"
+
+    fun encode(instance: TypedWidgetInstance): String {
+        val fields = FieldWriter()
+        val type = when (val configuration = instance.configuration) {
+            is TypedWidgetConfiguration.Battery -> {
+                configuration.value.writeFields(fields)
+                "BATTERY"
+            }
+            is TypedWidgetConfiguration.Weather -> {
+                configuration.value.writeFields(fields)
+                "WEATHER"
+            }
+            is TypedWidgetConfiguration.Analog -> {
+                configuration.value.writeFields(fields)
+                "ANALOG"
+            }
+            is TypedWidgetConfiguration.Search -> {
+                configuration.value.writeFields(fields)
+                "SEARCH"
+            }
+            is TypedWidgetConfiguration.Calendar -> {
+                configuration.value.writeFields(fields)
+                "CALENDAR"
+            }
+        }
+        return listOf(
+            PREFIX + CURRENT_VERSION,
+            instance.productId,
+            type,
+            fields.payload(),
+        ).joinToString("|")
+    }
+
+    fun decode(appWidgetId: Int, value: String): TypedWidgetInstance? {
+        val parts = value.split('|', limit = 4)
+        if (parts.size != 4) return null
+        val (header, productId, type, payload) = parts
+        if (productId.isBlank()) return null
+        val canonicalProductId = WidgetProductIds.canonicalize(productId)
+        return when (header) {
+            PREFIX + CURRENT_VERSION -> decodeVersionTwo(appWidgetId, canonicalProductId, type, payload)
+            PREFIX + LEGACY_VERSION -> decodeLegacy(appWidgetId, canonicalProductId, type, payload)
+            else -> null
+        }
+    }
+
+    private fun decodeVersionTwo(appWidgetId: Int, productId: String, type: String, payload: String): TypedWidgetInstance? {
+        val reader = FieldReader(payload)
+        val configuration = when (type) {
+            "BATTERY" -> TypedWidgetConfiguration.Battery(readBatteryFields(reader))
+            "WEATHER" -> TypedWidgetConfiguration.Weather(readWeatherFields(reader))
+            "ANALOG" -> TypedWidgetConfiguration.Analog(readAnalogFields(reader))
+            "SEARCH" -> TypedWidgetConfiguration.Search(readSearchFields(reader))
+            "CALENDAR" -> TypedWidgetConfiguration.Calendar(readCalendarFields(reader))
+            else -> return null
+        }
+        return TypedWidgetInstance(appWidgetId, productId, configuration)
+    }
+
+    private fun decodeLegacy(appWidgetId: Int, productId: String, type: String, payload: String): TypedWidgetInstance? {
+        val values = payload.split(';').mapNotNull { entry ->
+            val index = entry.indexOf('=')
+            if (index <= 0) null else entry.substring(0, index) to entry.substring(index + 1)
+        }.toMap()
+        fun bool(key: String, default: Boolean) = values[key]?.toBooleanStrictOrNull() ?: default
+        val configuration = when (type) {
+            "BATTERY" -> TypedWidgetConfiguration.Battery(
+                BatteryWidgetConfiguration(
+                    showPercentage = bool("percentage", true),
+                    showChargingState = bool("charging", true),
+                    showPlugSource = bool("plug", false),
+                ),
+            )
+            "WEATHER" -> TypedWidgetConfiguration.Weather(
+                WeatherWidgetConfiguration(locationName = values["location"]?.ifBlank { null }),
+            )
+            "CALENDAR" -> TypedWidgetConfiguration.Calendar(
+                CalendarWidgetConfiguration(
+                    showWeekday = bool("weekday", true),
+                    showMonth = bool("month", true),
+                ),
+            )
+            else -> return null
+        }
+        return TypedWidgetInstance(appWidgetId, productId, configuration)
+    }
+}
+
+private class FieldWriter {
+    private val entries = mutableListOf<String>()
+
+    fun add(key: String, value: Any?) {
+        entries.add("$key=${value.toString().replace(";", "").replace("|", "").replace("\n", " ")}")
+    }
+
+    fun payload(): String = entries.joinToString(";")
+}
+
+private class FieldReader(payload: String) {
+    private val values: Map<String, String> = payload.split(';').mapNotNull { entry ->
+        val index = entry.indexOf('=')
+        if (index <= 0) null else entry.substring(0, index) to entry.substring(index + 1)
+    }.toMap()
+
+    fun bool(key: String, default: Boolean): Boolean = values[key]?.toBooleanStrictOrNull() ?: default
+
+    fun float(key: String, default: Float): Float = values[key]?.toFloatOrNull() ?: default
+
+    fun text(key: String, default: String): String = values[key]?.ifBlank { default } ?: default
+
+    fun optionalText(key: String): String? = values[key]?.ifBlank { null }
+
+    fun <T : Enum<T>> enum(key: String, default: T, constants: Array<T>): T =
+        constants.firstOrNull { it.name == values[key] } ?: default
+}
+
+private fun WidgetBackgroundConfiguration.writeFields(fields: FieldWriter) {
+    fields.add("bgFill", fill.name)
+    fields.add("bgSolid", solidColorHex)
+    fields.add("bgSolidOpacity", solidOpacity)
+    fields.add("bgGradStart", gradientStartHex)
+    fields.add("bgGradEnd", gradientEndHex)
+    fields.add("bgGradAngle", gradientAngleDegrees)
+    fields.add("bgOpacity", opacity)
+    fields.add("bgShape", shape.name)
+    fields.add("bgRadius", cornerRadiusDp)
+    fields.add("bgBorderEnabled", borderEnabled)
+    fields.add("bgBorderWidth", borderWidthDp)
+    fields.add("bgBorderColor", borderColorHex)
+    fields.add("bgBorderOpacity", borderOpacity)
+    fields.add("bgHighlightEnabled", highlightEnabled)
+    fields.add("bgHighlightColor", highlightColorHex)
+    fields.add("bgHighlightOpacity", highlightOpacity)
+}
+
+private fun readBackgroundFields(reader: FieldReader): WidgetBackgroundConfiguration = WidgetBackgroundConfiguration(
+    fill = reader.enum("bgFill", WidgetBackgroundFill.LINEAR_GRADIENT, WidgetBackgroundFill.entries.toTypedArray()),
+    solidColorHex = reader.text("bgSolid", WidgetBackgroundConfiguration().solidColorHex),
+    solidOpacity = reader.float("bgSolidOpacity", 1f),
+    gradientStartHex = reader.text("bgGradStart", WidgetBackgroundConfiguration().gradientStartHex),
+    gradientEndHex = reader.text("bgGradEnd", WidgetBackgroundConfiguration().gradientEndHex),
+    gradientAngleDegrees = reader.float("bgGradAngle", 135f),
+    opacity = reader.float("bgOpacity", 1f),
+    shape = reader.enum("bgShape", WidgetBackgroundShape.ROUNDED, WidgetBackgroundShape.entries.toTypedArray()),
+    cornerRadiusDp = reader.float("bgRadius", 24f),
+    borderEnabled = reader.bool("bgBorderEnabled", true),
+    borderWidthDp = reader.float("bgBorderWidth", 1f),
+    borderColorHex = reader.text("bgBorderColor", WidgetBackgroundConfiguration().borderColorHex),
+    borderOpacity = reader.float("bgBorderOpacity", 0.12f),
+    highlightEnabled = reader.bool("bgHighlightEnabled", true),
+    highlightColorHex = reader.text("bgHighlightColor", WidgetBackgroundConfiguration().highlightColorHex),
+    highlightOpacity = reader.float("bgHighlightOpacity", 0.16f),
+)
+
+private fun WidgetActionConfiguration.writeFields(fields: FieldWriter) {
+    fields.add("actType", type.name)
+    fields.add("actPackage", packageName.orEmpty())
+}
+
+private fun readActionFields(reader: FieldReader): WidgetActionConfiguration = WidgetActionConfiguration(
+    type = reader.enum("actType", WidgetActionType.NONE, WidgetActionType.entries.toTypedArray()),
+    packageName = reader.optionalText("actPackage"),
+)
+
+private fun BatteryWidgetConfiguration.writeFields(fields: FieldWriter) {
+    fields.add("layout", layout.name)
+    fields.add("percentage", showPercentage)
+    fields.add("charging", showChargingState)
+    fields.add("plug", showPlugSource)
+    fields.add("icon", showIcon)
+    fields.add("textScale", textScale)
+    fields.add("percentColor", percentColorHex)
+    fields.add("statusColor", statusColorHex)
+    fields.add("progressColor", progressColorHex)
+    fields.add("lowColor", lowBatteryColorHex)
+    fields.add("chargingColor", chargingColorHex)
+    fields.add("padding", contentPaddingDp)
+    fields.add("alignStart", alignStart)
+    background.writeFields(fields)
+    action.writeFields(fields)
+}
+
+private fun readBatteryFields(reader: FieldReader): BatteryWidgetConfiguration {
+    val defaults = BatteryWidgetConfiguration()
+    return BatteryWidgetConfiguration(
+        layout = reader.enum("layout", defaults.layout, BatteryWidgetLayout.entries.toTypedArray()),
+        showPercentage = reader.bool("percentage", true),
+        showChargingState = reader.bool("charging", true),
+        showPlugSource = reader.bool("plug", false),
+        showIcon = reader.bool("icon", true),
+        textScale = reader.float("textScale", 1f),
+        percentColorHex = reader.text("percentColor", defaults.percentColorHex),
+        statusColorHex = reader.text("statusColor", defaults.statusColorHex),
+        progressColorHex = reader.text("progressColor", defaults.progressColorHex),
+        lowBatteryColorHex = reader.text("lowColor", defaults.lowBatteryColorHex),
+        chargingColorHex = reader.text("chargingColor", defaults.chargingColorHex),
+        contentPaddingDp = reader.float("padding", 16f),
+        alignStart = reader.bool("alignStart", false),
+        background = readBackgroundFields(reader),
+        action = readActionFields(reader),
+    )
+}
+
+private fun WeatherWidgetConfiguration.writeFields(fields: FieldWriter) {
+    fields.add("layout", layout.name)
+    fields.add("temperature", showTemperature)
+    fields.add("condition", showCondition)
+    fields.add("location", showLocation)
+    fields.add("highLow", showHighLow)
+    fields.add("icon", showIcon)
+    fields.add("units", units.name)
+    fields.add("textScale", textScale)
+    fields.add("tempColor", temperatureColorHex)
+    fields.add("secondaryColor", secondaryColorHex)
+    fields.add("iconTint", iconTintHex)
+    fields.add("padding", contentPaddingDp)
+    fields.add("alignStart", alignStart)
+    fields.add("locationName", locationName.orEmpty())
+    background.writeFields(fields)
+    action.writeFields(fields)
+}
+
+private fun readWeatherFields(reader: FieldReader): WeatherWidgetConfiguration {
+    val defaults = WeatherWidgetConfiguration()
+    return WeatherWidgetConfiguration(
+        layout = reader.enum("layout", defaults.layout, WeatherWidgetLayout.entries.toTypedArray()),
+        showTemperature = reader.bool("temperature", true),
+        showCondition = reader.bool("condition", true),
+        showLocation = reader.bool("location", true),
+        showHighLow = reader.bool("highLow", false),
+        showIcon = reader.bool("icon", true),
+        units = reader.enum("units", defaults.units, WeatherUnits.entries.toTypedArray()),
+        textScale = reader.float("textScale", 1f),
+        temperatureColorHex = reader.text("tempColor", defaults.temperatureColorHex),
+        secondaryColorHex = reader.text("secondaryColor", defaults.secondaryColorHex),
+        iconTintHex = reader.text("iconTint", defaults.iconTintHex),
+        contentPaddingDp = reader.float("padding", 16f),
+        alignStart = reader.bool("alignStart", false),
+        locationName = reader.optionalText("locationName"),
+        background = readBackgroundFields(reader),
+        action = readActionFields(reader),
+    )
+}
+
+private fun AnalogClockConfiguration.writeFields(fields: FieldWriter) {
+    fields.add("hourMarkers", showHourMarkers)
+    fields.add("minuteMarkers", showMinuteMarkers)
+    fields.add("markerStyle", markerStyle.name)
+    fields.add("markerColor", markerColorHex)
+    fields.add("numberStyle", numberStyle.name)
+    fields.add("numberColor", numberColorHex)
+    fields.add("dialFill", dialFillEnabled)
+    fields.add("dialColor", dialColorHex)
+    fields.add("hourHand", showHourHand)
+    fields.add("minuteHand", showMinuteHand)
+    fields.add("secondHand", showSecondHand)
+    fields.add("hourHandColor", hourHandColorHex)
+    fields.add("minuteHandColor", minuteHandColorHex)
+    fields.add("secondHandColor", secondHandColorHex)
+    fields.add("capStyle", capStyle.name)
+    fields.add("capColor", capColorHex)
+    fields.add("dateEnabled", date.enabled)
+    fields.add("datePlacement", date.placement.name)
+    fields.add("dateAlign", date.alignment.name)
+    fields.add("dateWeekday", date.weekdayStyle.name)
+    fields.add("dateMonth", date.monthStyle.name)
+    fields.add("dateYear", date.yearStyle.name)
+    fields.add("datePreset", date.formatPreset.name)
+    fields.add("dateFont", dateFontFamily.name)
+    fields.add("dateColor", dateColorHex)
+    fields.add("scale", contentScale)
+    fields.add("padding", contentPaddingDp)
+    background.writeFields(fields)
+    action.writeFields(fields)
+}
+
+private fun readAnalogFields(reader: FieldReader): AnalogClockConfiguration {
+    val defaults = AnalogClockConfiguration()
+    val dateDefaults = ClockDateConfiguration()
+    return AnalogClockConfiguration(
+        showHourMarkers = reader.bool("hourMarkers", true),
+        showMinuteMarkers = reader.bool("minuteMarkers", true),
+        markerStyle = reader.enum("markerStyle", defaults.markerStyle, AnalogMarkerStyle.entries.toTypedArray()),
+        markerColorHex = reader.text("markerColor", defaults.markerColorHex),
+        numberStyle = reader.enum("numberStyle", defaults.numberStyle, AnalogNumberStyle.entries.toTypedArray()),
+        numberColorHex = reader.text("numberColor", defaults.numberColorHex),
+        dialFillEnabled = reader.bool("dialFill", true),
+        dialColorHex = reader.text("dialColor", defaults.dialColorHex),
+        showHourHand = reader.bool("hourHand", true),
+        showMinuteHand = reader.bool("minuteHand", true),
+        showSecondHand = reader.bool("secondHand", true),
+        hourHandColorHex = reader.text("hourHandColor", defaults.hourHandColorHex),
+        minuteHandColorHex = reader.text("minuteHandColor", defaults.minuteHandColorHex),
+        secondHandColorHex = reader.text("secondHandColor", defaults.secondHandColorHex),
+        capStyle = reader.enum("capStyle", defaults.capStyle, AnalogCapStyle.entries.toTypedArray()),
+        capColorHex = reader.text("capColor", defaults.capColorHex),
+        date = ClockDateConfiguration(
+            enabled = reader.bool("dateEnabled", false),
+            placement = reader.enum("datePlacement", dateDefaults.placement, ClockDatePlacement.entries.toTypedArray()),
+            alignment = reader.enum("dateAlign", ClockDateAlignment.CENTER, ClockDateAlignment.entries.toTypedArray()),
+            weekdayStyle = reader.enum("dateWeekday", ClockWeekdayStyle.HIDDEN, ClockWeekdayStyle.entries.toTypedArray()),
+            monthStyle = reader.enum("dateMonth", ClockMonthStyle.SHORT_NAME, ClockMonthStyle.entries.toTypedArray()),
+            yearStyle = reader.enum("dateYear", ClockYearStyle.HIDDEN, ClockYearStyle.entries.toTypedArray()),
+            formatPreset = reader.enum("datePreset", ClockDateFormatPreset.DAY_MONTH, ClockDateFormatPreset.entries.toTypedArray()),
+        ),
+        dateFontFamily = reader.enum("dateFont", ClockFontFamily.SYSTEM, ClockFontFamily.entries.toTypedArray()),
+        dateColorHex = reader.text("dateColor", defaults.dateColorHex),
+        contentScale = reader.float("scale", 1f),
+        contentPaddingDp = reader.float("padding", 14f),
+        background = readBackgroundFields(reader),
+        action = readActionFields(reader),
+    )
+}
+
+private fun SearchWidgetConfiguration.writeFields(fields: FieldWriter) {
+    fields.add("target", target.name)
+    fields.add("customApp", customAppPackage.orEmpty())
+    fields.add("hint", hintText)
+    fields.add("searchIcon", showSearchIcon)
+    fields.add("voiceIcon", showVoiceIcon)
+    fields.add("hintColor", hintColorHex)
+    fields.add("iconColor", iconColorHex)
+    fields.add("textScale", textScale)
+    fields.add("padding", contentPaddingDp)
+    fields.add("alignStart", alignStart)
+    fields.add("tapAction", tapAction.name)
+    background.writeFields(fields)
+    action.writeFields(fields)
+}
+
+private fun readSearchFields(reader: FieldReader): SearchWidgetConfiguration {
+    val defaults = SearchWidgetConfiguration()
+    return SearchWidgetConfiguration(
+        target = reader.enum("target", defaults.target, SearchTarget.entries.toTypedArray()),
+        customAppPackage = reader.optionalText("customApp"),
+        hintText = reader.text("hint", defaults.hintText),
+        showSearchIcon = reader.bool("searchIcon", true),
+        showVoiceIcon = reader.bool("voiceIcon", true),
+        hintColorHex = reader.text("hintColor", defaults.hintColorHex),
+        iconColorHex = reader.text("iconColor", defaults.iconColorHex),
+        textScale = reader.float("textScale", 1f),
+        contentPaddingDp = reader.float("padding", 18f),
+        alignStart = reader.bool("alignStart", true),
+        tapAction = reader.enum("tapAction", defaults.tapAction, SearchTapAction.entries.toTypedArray()),
+        background = readBackgroundFields(reader),
+        action = readActionFields(reader),
+    )
+}
+
+private fun CalendarWidgetConfiguration.writeFields(fields: FieldWriter) {
+    fields.add("weekday", showWeekday)
+    fields.add("month", showMonth)
+}
+
+private fun readCalendarFields(reader: FieldReader): CalendarWidgetConfiguration =
+    CalendarWidgetConfiguration(
+        showWeekday = reader.bool("weekday", true),
+        showMonth = reader.bool("month", true),
+    )
+
+class InMemoryTypedWidgetInstanceRepository : TypedWidgetInstanceRepository {
+    private val instances = mutableMapOf<Int, TypedWidgetInstance>()
+
+    override suspend fun get(appWidgetId: Int): TypedWidgetInstance? = instances[appWidgetId]
+
+    override suspend fun save(instance: TypedWidgetInstance) {
+        instances[instance.appWidgetId] = instance
+    }
+
+    override suspend fun delete(appWidgetId: Int) {
+        instances.remove(appWidgetId)
+    }
+}
+
+class DataStoreTypedWidgetInstanceRepository(
+    private val preferencesDataStore: DataStore<Preferences>,
+) : TypedWidgetInstanceRepository {
+    override suspend fun get(appWidgetId: Int): TypedWidgetInstance? {
+        val value = preferencesDataStore.data.first()[keyFor(appWidgetId)] ?: return null
+        val instance = TypedWidgetInstanceCodec.decode(appWidgetId, value) ?: return null
+        // Re-save when the stored form is outdated, including legacy preset product IDs.
+        if (TypedWidgetInstanceCodec.encode(instance) != value) save(instance)
+        return instance
+    }
+
+    override suspend fun save(instance: TypedWidgetInstance) {
+        preferencesDataStore.edit { preferences ->
+            preferences[keyFor(instance.appWidgetId)] = TypedWidgetInstanceCodec.encode(instance)
+        }
+    }
+
+    override suspend fun delete(appWidgetId: Int) {
+        preferencesDataStore.edit { preferences -> preferences.remove(keyFor(appWidgetId)) }
+    }
+
+    private fun keyFor(appWidgetId: Int): Preferences.Key<String> =
+        stringPreferencesKey("non_clock_widget_instance_$appWidgetId")
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\data\WidgetInstanceRepository.kt ================
+
+package com.r2h_widget.data
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.r2h_widget.catalog.WidgetProductIds
+import com.r2h_widget.widget.clock.ClockAccent
+import com.r2h_widget.widget.clock.ClockDateAlignment
+import com.r2h_widget.widget.clock.ClockDateFormatPreset
+import com.r2h_widget.widget.clock.ClockDatePlacement
+import com.r2h_widget.widget.clock.ClockFontFamily
+import com.r2h_widget.widget.clock.ClockMonthStyle
+import com.r2h_widget.widget.clock.ClockTimeAlignment
+import com.r2h_widget.widget.clock.ClockTimeSeparator
+import com.r2h_widget.widget.clock.ClockWeekdayStyle
+import com.r2h_widget.widget.clock.ClockYearStyle
+import com.r2h_widget.widget.clock.DigitalClockConfiguration
+import com.r2h_widget.widget.clock.ResponsiveWidgetConfiguration
+import com.r2h_widget.widget.common.WidgetActionConfiguration
+import com.r2h_widget.widget.common.WidgetActionType
+import com.r2h_widget.widget.common.WidgetBackgroundConfiguration
+import com.r2h_widget.widget.common.WidgetBackgroundFill
+import com.r2h_widget.widget.common.WidgetBackgroundShape
+import com.r2h_widget.widget.common.WidgetEffectsConfiguration
+import com.r2h_widget.widget.clock.WidgetLayoutConfiguration
+import com.r2h_widget.widget.clock.WidgetTypographyConfiguration
+import com.r2h_widget.widget.clock.ClockContentConfiguration
+import com.r2h_widget.widget.clock.ClockDateConfiguration
+import kotlinx.coroutines.flow.first
+
+data class WidgetInstance(
+    val appWidgetId: Int,
+    val productId: String,
+    val configuration: DigitalClockConfiguration,
+)
+
+interface WidgetInstanceRepository {
+    suspend fun get(appWidgetId: Int): WidgetInstance?
+
+    suspend fun save(instance: WidgetInstance)
+
+    suspend fun delete(appWidgetId: Int)
+}
+
+object WidgetInstanceCodec {
+    private const val PREFIX = "#*!"
+    private const val CURRENT_VERSION = "2"
+    private const val FIELD_SEPARATOR = "|"
+    private const val KEY_VALUE_SEPARATOR = ";"
+    private const val ASSIGNMENT = "="
+
+    /**
+     * Version 2 is intentionally explicit and key-based. This keeps new optional fields
+     * migration-safe without making the domain layer a bag of strings.
+     */
+    fun encode(instance: WidgetInstance): String {
+        val configuration = instance.configuration
+        val values = linkedMapOf(
+            "use24" to configuration.content.use24HourFormat,
+            "ampm" to configuration.content.showAmPm,
+            "leadingZero" to configuration.content.leadingZero,
+            "separator" to configuration.content.separator.name,
+            "timeAlign" to configuration.content.alignment.name,
+            "seconds" to configuration.content.showSeconds,
+            "dateEnabled" to configuration.date.enabled,
+            "datePlacement" to configuration.date.placement.name,
+            "dateAlign" to configuration.date.alignment.name,
+            "weekday" to configuration.date.weekdayStyle.name,
+            "month" to configuration.date.monthStyle.name,
+            "year" to configuration.date.yearStyle.name,
+            "datePreset" to configuration.date.formatPreset.name,
+            "fill" to configuration.background.fill.name,
+            "solid" to configuration.background.solidColorHex,
+            "solidOpacity" to configuration.background.solidOpacity,
+            "gradientStart" to configuration.background.gradientStartHex,
+            "gradientEnd" to configuration.background.gradientEndHex,
+            "gradientAngle" to configuration.background.gradientAngleDegrees,
+            "backgroundOpacity" to configuration.background.opacity,
+            "shape" to configuration.background.shape.name,
+            "cornerRadius" to configuration.background.cornerRadiusDp,
+            "borderEnabled" to configuration.background.borderEnabled,
+            "borderWidth" to configuration.background.borderWidthDp,
+            "borderColor" to configuration.background.borderColorHex,
+            "borderOpacity" to configuration.background.borderOpacity,
+            "highlightEnabled" to configuration.background.highlightEnabled,
+            "highlightColor" to configuration.background.highlightColorHex,
+            "highlightOpacity" to configuration.background.highlightOpacity,
+            "timeFont" to configuration.typography.timeFontFamily.name,
+            "timeWeight" to configuration.typography.timeFontWeight,
+            "timeScale" to configuration.typography.timeScale,
+            "timeColor" to configuration.typography.timeColorHex,
+            "letterSpacing" to configuration.typography.letterSpacing,
+            "dateFont" to configuration.typography.dateFontFamily.name,
+            "dateWeight" to configuration.typography.dateFontWeight,
+            "dateScale" to configuration.typography.dateScale,
+            "dateColor" to configuration.typography.dateColorHex,
+            "dateOpacity" to configuration.typography.dateOpacity,
+            "padding" to configuration.layout.contentPaddingDp,
+            "horizontalOffset" to configuration.layout.horizontalOffsetDp,
+            "verticalOffset" to configuration.layout.verticalOffsetDp,
+            "timeDateGap" to configuration.layout.timeDateGapDp,
+            "layoutAlign" to configuration.layout.alignment.name,
+            "glowEnabled" to configuration.effects.glowEnabled,
+            "glowColor" to configuration.effects.glowColorHex,
+            "glowStrength" to configuration.effects.glowStrength,
+            "action" to configuration.action.type.name,
+            "actionPackage" to configuration.action.packageName.orEmpty(),
+            "compactScale" to configuration.responsive.compactScale,
+            "mediumScale" to configuration.responsive.mediumScale,
+            "expandedScale" to configuration.responsive.expandedScale,
+            "compactShowDate" to configuration.responsive.compactShowDate,
+            "presetId" to configuration.presetId.orEmpty(),
+        )
+        val payload = values.entries.joinToString(KEY_VALUE_SEPARATOR) { (key, value) ->
+            "$key$ASSIGNMENT${value.toString().replace(";", "")}" 
+        }
+        return listOf(PREFIX + CURRENT_VERSION, instance.productId, payload).joinToString(FIELD_SEPARATOR)
+    }
+
+    fun decode(appWidgetId: Int, value: String): WidgetInstance? {
+        val fields = value.split(FIELD_SEPARATOR, limit = 3)
+        if (fields.size < 3) return decodeLegacyPipeValue(appWidgetId, value)
+        return when (fields[0]) {
+            PREFIX + CURRENT_VERSION -> decodeVersionTwo(appWidgetId, fields[1], fields[2])
+            PREFIX + "1" -> decodeLegacyPipeValue(appWidgetId, value.removePrefix(PREFIX))
+            "1" -> decodeLegacyPipeValue(appWidgetId, value)
+            else -> null
+        }
+    }
+
+    fun isCurrent(value: String): Boolean = value.startsWith(PREFIX + CURRENT_VERSION + FIELD_SEPARATOR)
+
+    private fun decodeVersionTwo(appWidgetId: Int, productId: String, payload: String): WidgetInstance? {
+        if (productId.isBlank()) return null
+        val values = payload.split(KEY_VALUE_SEPARATOR).mapNotNull { entry ->
+            val separatorIndex = entry.indexOf(ASSIGNMENT)
+            if (separatorIndex <= 0) null else entry.substring(0, separatorIndex) to entry.substring(separatorIndex + 1)
+        }.toMap()
+        val defaults = DigitalClockConfiguration()
+        fun bool(key: String, default: Boolean) = values[key]?.toBooleanStrictOrNull() ?: default
+        fun float(key: String, default: Float) = values[key]?.toFloatOrNull() ?: default
+        fun int(key: String, default: Int) = values[key]?.toIntOrNull() ?: default
+        fun text(key: String, default: String) = values[key].orEmpty().ifBlank { default }
+        fun <T : Enum<T>> enum(key: String, default: T, values: Array<T>): T = values.firstOrNull {
+            it.name == text(key, default.name)
+        } ?: default
+
+        val accent = ClockAccent.fromHex(text("timeColor", defaults.typography.timeColorHex))
+        val configuration = DigitalClockConfiguration(
+            content = ClockContentConfiguration(
+                use24HourFormat = bool("use24", defaults.content.use24HourFormat),
+                showAmPm = bool("ampm", defaults.content.showAmPm),
+                leadingZero = bool("leadingZero", defaults.content.leadingZero),
+                separator = enum("separator", defaults.content.separator, ClockTimeSeparator.entries.toTypedArray()),
+                showSeconds = bool("seconds", defaults.content.showSeconds),
+                alignment = enum("timeAlign", defaults.content.alignment, ClockTimeAlignment.entries.toTypedArray()),
+            ),
+            date = ClockDateConfiguration(
+                enabled = bool("dateEnabled", defaults.date.enabled),
+                placement = enum("datePlacement", defaults.date.placement, ClockDatePlacement.entries.toTypedArray()),
+                alignment = enum("dateAlign", defaults.date.alignment, ClockDateAlignment.entries.toTypedArray()),
+                weekdayStyle = enum("weekday", defaults.date.weekdayStyle, ClockWeekdayStyle.entries.toTypedArray()),
+                monthStyle = enum("month", defaults.date.monthStyle, ClockMonthStyle.entries.toTypedArray()),
+                yearStyle = enum("year", defaults.date.yearStyle, ClockYearStyle.entries.toTypedArray()),
+                formatPreset = enum("datePreset", defaults.date.formatPreset, ClockDateFormatPreset.entries.toTypedArray()),
+            ),
+            background = WidgetBackgroundConfiguration(
+                fill = enum("fill", defaults.background.fill, WidgetBackgroundFill.entries.toTypedArray()),
+                solidColorHex = text("solid", defaults.background.solidColorHex),
+                solidOpacity = float("solidOpacity", defaults.background.solidOpacity),
+                gradientStartHex = text("gradientStart", defaults.background.gradientStartHex),
+                gradientEndHex = text("gradientEnd", defaults.background.gradientEndHex),
+                gradientAngleDegrees = float("gradientAngle", defaults.background.gradientAngleDegrees),
+                opacity = float("backgroundOpacity", defaults.background.opacity),
+                shape = enum("shape", defaults.background.shape, WidgetBackgroundShape.entries.toTypedArray()),
+                cornerRadiusDp = float("cornerRadius", defaults.background.cornerRadiusDp),
+                borderEnabled = bool("borderEnabled", defaults.background.borderEnabled),
+                borderWidthDp = float("borderWidth", defaults.background.borderWidthDp),
+                borderColorHex = text("borderColor", defaults.background.borderColorHex),
+                borderOpacity = float("borderOpacity", defaults.background.borderOpacity),
+                highlightEnabled = bool("highlightEnabled", defaults.background.highlightEnabled),
+                highlightColorHex = text("highlightColor", defaults.background.highlightColorHex),
+                highlightOpacity = float("highlightOpacity", defaults.background.highlightOpacity),
+            ),
+            typography = WidgetTypographyConfiguration(
+                timeFontFamily = enum("timeFont", defaults.typography.timeFontFamily, ClockFontFamily.entries.toTypedArray()),
+                timeFontWeight = int("timeWeight", defaults.typography.timeFontWeight),
+                timeScale = float("timeScale", defaults.typography.timeScale),
+                timeColorHex = text("timeColor", accent.colorHex),
+                letterSpacing = float("letterSpacing", defaults.typography.letterSpacing),
+                dateFontFamily = enum("dateFont", defaults.typography.dateFontFamily, ClockFontFamily.entries.toTypedArray()),
+                dateFontWeight = int("dateWeight", defaults.typography.dateFontWeight),
+                dateScale = float("dateScale", defaults.typography.dateScale),
+                dateColorHex = text("dateColor", defaults.typography.dateColorHex),
+                dateOpacity = float("dateOpacity", defaults.typography.dateOpacity),
+            ),
+            layout = WidgetLayoutConfiguration(
+                contentPaddingDp = float("padding", defaults.layout.contentPaddingDp),
+                horizontalOffsetDp = float("horizontalOffset", defaults.layout.horizontalOffsetDp),
+                verticalOffsetDp = float("verticalOffset", defaults.layout.verticalOffsetDp),
+                timeDateGapDp = float("timeDateGap", defaults.layout.timeDateGapDp),
+                alignment = enum("layoutAlign", defaults.layout.alignment, ClockTimeAlignment.entries.toTypedArray()),
+            ),
+            effects = WidgetEffectsConfiguration(
+                glowEnabled = bool("glowEnabled", defaults.effects.glowEnabled),
+                glowColorHex = text("glowColor", defaults.effects.glowColorHex),
+                glowStrength = float("glowStrength", defaults.effects.glowStrength),
+            ),
+            action = WidgetActionConfiguration(
+                type = enum("action", defaults.action.type, WidgetActionType.entries.toTypedArray()),
+                packageName = values["actionPackage"]?.ifBlank { null },
+            ),
+            responsive = ResponsiveWidgetConfiguration(
+                compactScale = float("compactScale", defaults.responsive.compactScale),
+                mediumScale = float("mediumScale", defaults.responsive.mediumScale),
+                expandedScale = float("expandedScale", defaults.responsive.expandedScale),
+                compactShowDate = bool("compactShowDate", defaults.responsive.compactShowDate),
+            ),
+            presetId = values["presetId"]?.ifBlank { null },
+        )
+        return WidgetInstance(appWidgetId, WidgetProductIds.canonicalize(productId), configuration)
+    }
+
+    private fun decodeLegacyPipeValue(appWidgetId: Int, value: String): WidgetInstance? {
+        val fields = value.split(FIELD_SEPARATOR)
+        if (fields.size != 6 || fields[0] != "1") return null
+        val use24HourFormat = fields[2].toBooleanStrictOrNull() ?: return null
+        val showDate = fields[3].toBooleanStrictOrNull() ?: return null
+        val showWeekday = fields[4].toBooleanStrictOrNull() ?: return null
+        val accent = runCatching { ClockAccent.valueOf(fields[5]) }.getOrNull() ?: return null
+        return WidgetInstance(
+            appWidgetId = appWidgetId,
+            productId = WidgetProductIds.canonicalize(fields[1]),
+            configuration = DigitalClockConfiguration(
+                use24HourFormat = use24HourFormat,
+                showDate = showDate,
+                showWeekday = showWeekday,
+                accent = accent,
+            ),
+        )
+    }
+}
+
+class InMemoryWidgetInstanceRepository : WidgetInstanceRepository {
+    private val instances = mutableMapOf<Int, WidgetInstance>()
+
+    override suspend fun get(appWidgetId: Int): WidgetInstance? = instances[appWidgetId]
+
+    override suspend fun save(instance: WidgetInstance) {
+        instances[instance.appWidgetId] = instance
+    }
+
+    override suspend fun delete(appWidgetId: Int) {
+        instances.remove(appWidgetId)
+    }
+}
+
+class DataStoreWidgetInstanceRepository(
+    private val preferencesDataStore: DataStore<Preferences>,
+) : WidgetInstanceRepository {
+    override suspend fun get(appWidgetId: Int): WidgetInstance? {
+        val value = preferencesDataStore.data.first()[keyFor(appWidgetId)] ?: return null
+        val instance = WidgetInstanceCodec.decode(appWidgetId, value) ?: return null
+        // Re-save when the stored form is outdated, including legacy preset product IDs.
+        if (WidgetInstanceCodec.encode(instance) != value) save(instance)
+        return instance
+    }
+
+    override suspend fun save(instance: WidgetInstance) {
+        preferencesDataStore.edit { preferences ->
+            preferences[keyFor(instance.appWidgetId)] = WidgetInstanceCodec.encode(instance)
+        }
+    }
+
+    override suspend fun delete(appWidgetId: Int) {
+        preferencesDataStore.edit { preferences ->
+            preferences.remove(keyFor(appWidgetId))
+        }
+    }
+
+    private fun keyFor(appWidgetId: Int): Preferences.Key<String> =
+        stringPreferencesKey("widget_instance_$appWidgetId")
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\data\WidgetPresetRepository.kt ================
+
+package com.r2h_widget.data
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.r2h_widget.widget.clock.ClockWidgetPreset
+import com.r2h_widget.widget.clock.DigitalClockConfiguration
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+
+interface WidgetPresetRepository {
+    val customPresets: Flow<List<ClockWidgetPreset>>
+
+    suspend fun save(preset: ClockWidgetPreset)
+
+    suspend fun delete(presetId: String)
+}
+
+class InMemoryWidgetPresetRepository : WidgetPresetRepository {
+    private val presets = kotlinx.coroutines.flow.MutableStateFlow<List<ClockWidgetPreset>>(emptyList())
+    override val customPresets: Flow<List<ClockWidgetPreset>> = presets
+
+    override suspend fun save(preset: ClockWidgetPreset) {
+        presets.value = (presets.value.filterNot { it.id == preset.id } + preset)
+    }
+
+    override suspend fun delete(presetId: String) {
+        presets.value = presets.value.filterNot { it.id == presetId }
+    }
+}
+
+class DataStoreWidgetPresetRepository(
+    private val preferencesDataStore: DataStore<Preferences>,
+) : WidgetPresetRepository {
+    override val customPresets: Flow<List<ClockWidgetPreset>> = preferencesDataStore.data.map { preferences ->
+        preferences[presetIdsKey].orEmpty().mapNotNull { id ->
+            val stored = preferences[presetKey(id)] ?: return@mapNotNull null
+            val fields = stored.split("|", limit = 2)
+            if (fields.size != 2) return@mapNotNull null
+            val instance = WidgetInstanceCodec.decode(0, fields[1]) ?: return@mapNotNull null
+            ClockWidgetPreset(id = id, name = fields[0], configuration = instance.configuration)
+        }.sortedBy { it.name }
+    }
+
+    override suspend fun save(preset: ClockWidgetPreset) {
+        preferencesDataStore.edit { preferences ->
+            preferences[presetIdsKey] = preferences[presetIdsKey].orEmpty() + preset.id
+            preferences[presetKey(preset.id)] = "${preset.name.replace("|", " ")}|${WidgetInstanceCodec.encode(
+                WidgetInstance(0, com.r2h_widget.catalog.WidgetProductIds.DIGITAL_CLOCK, preset.configuration),
+            )}"
+        }
+    }
+
+    override suspend fun delete(presetId: String) {
+        preferencesDataStore.edit { preferences ->
+            preferences[presetIdsKey] = preferences[presetIdsKey].orEmpty() - presetId
+            preferences.remove(presetKey(presetId))
+        }
+    }
+
+    private fun presetKey(id: String): Preferences.Key<String> = stringPreferencesKey("custom_preset_$id")
+
+    private companion object {
+        val presetIdsKey = stringSetPreferencesKey("custom_preset_ids")
+    }
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\MainActivity.kt ================
+
+package com.r2h_widget
+
+import android.os.Bundle
+import android.content.Intent
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.ViewModelProvider
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import com.r2h_widget.data.AppDependencies
+import com.r2h_widget.ui.AppAction
+import com.r2h_widget.ui.AppUiState
+import com.r2h_widget.ui.AppViewModelFactory
+import com.r2h_widget.ui.MainViewModel
+import com.r2h_widget.ui.R2HWidgetApp
+import com.r2h_widget.ui.WidgetDetailsViewModel
+import com.r2h_widget.ui.theme.R2HWidgetTheme
+import com.r2h_widget.widget.pinning.AndroidWidgetPinningController
+import com.r2h_widget.widget.clock.DigitalClockWidgetReceiver
+import com.r2h_widget.widget.clock.EXTRA_EDIT_APP_WIDGET_ID
+import com.r2h_widget.widget.clock.EXTRA_EDIT_PRODUCT_ID
+
+class MainActivity : ComponentActivity() {
+    private val dependencies by lazy { AppDependencies(applicationContext) }
+    private val viewModelFactory by lazy { AppViewModelFactory(dependencies) }
+    private val mainViewModel: MainViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+    }
+    private val detailsViewModel: WidgetDetailsViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[WidgetDetailsViewModel::class.java]
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            R2HWidgetTheme {
+                R2HWidgetApp(
+                    viewModel = mainViewModel,
+                    detailsViewModel = detailsViewModel,
+                    pinningController = AndroidWidgetPinningController(this@MainActivity),
+                )
+            }
+        }
+        handleWidgetEditIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleWidgetEditIntent(intent)
+    }
+
+    private fun handleWidgetEditIntent(intent: Intent?) {
+        val appWidgetId = intent?.getIntExtra(
+            EXTRA_EDIT_APP_WIDGET_ID,
+            android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID,
+        ) ?: return
+        if (appWidgetId == android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID) return
+        val productId = intent.getStringExtra(EXTRA_EDIT_PRODUCT_ID)
+            ?: DigitalClockWidgetReceiver.DEFAULT_PRODUCT_ID
+        // Legacy pinned widgets still carry preset IDs such as clock-03; they edit
+        // the canonical Digital Clock product with their configuration preserved.
+        mainViewModel.onAction(
+            AppAction.OpenWidgetDetails(com.r2h_widget.catalog.WidgetProductIds.canonicalize(productId), appWidgetId),
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun R2HWidgetPreview() {
+    R2HWidgetTheme {
+        com.r2h_widget.ui.R2HWidgetAppContent(
+            uiState = AppUiState(),
+            onAction = { _: AppAction -> },
+        )
+    }
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\ui\AppViewModel.kt ================
+
+package com.r2h_widget.ui
+
+import androidx.lifecycle.ViewModel
+import com.r2h_widget.catalog.WidgetCategory
+import com.r2h_widget.data.FavoritesRepository
+import com.r2h_widget.data.InMemoryFavoritesRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.update
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+
+enum class AppDestination(val label: String) {
+    WIDGETS("Widgets"),
+    ICONS("Icons"),
+    WALLS("Walls"),
+}
+
+sealed interface AppRoute {
+    data object Home : AppRoute
+    data class WidgetDetails(val widgetId: String, val appWidgetId: Int? = null) : AppRoute
+}
+
+data class AppUiState(
+    val route: AppRoute = AppRoute.Home,
+    val selectedDestination: AppDestination = AppDestination.WIDGETS,
+    val selectedWidgetCategory: WidgetCategory = WidgetCategory.ALL,
+    val favoriteIds: Set<String> = emptySet(),
+)
+
+sealed interface AppAction {
+    data class SelectDestination(val destination: AppDestination) : AppAction
+    data class SelectWidgetCategory(val category: WidgetCategory) : AppAction
+    data class OpenWidgetDetails(val widgetId: String, val appWidgetId: Int? = null) : AppAction
+    data object NavigateBack : AppAction
+    data class ToggleFavorite(val productId: String) : AppAction
+}
+
+class MainViewModel(
+    private val favoritesRepository: FavoritesRepository = InMemoryFavoritesRepository(),
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(AppUiState())
+    val uiState: StateFlow<AppUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            favoritesRepository.favoriteIds.collect { favoriteIds ->
+                _uiState.update { it.copy(favoriteIds = favoriteIds) }
+            }
+        }
+    }
+
+    fun onAction(action: AppAction) {
+        when (action) {
+            is AppAction.SelectDestination -> _uiState.update {
+                it.copy(route = AppRoute.Home, selectedDestination = action.destination)
+            }
+
+            is AppAction.SelectWidgetCategory -> _uiState.update {
+                it.copy(selectedWidgetCategory = action.category)
+            }
+
+            is AppAction.OpenWidgetDetails -> _uiState.update {
+                it.copy(route = AppRoute.WidgetDetails(action.widgetId, action.appWidgetId))
+            }
+
+            AppAction.NavigateBack -> _uiState.update { it.copy(route = AppRoute.Home) }
+
+            is AppAction.ToggleFavorite -> viewModelScope.launch {
+                favoritesRepository.toggleFavorite(action.productId)
+            }
+        }
+    }
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\ui\WidgetDetailsViewModel.kt ================
+
+package com.r2h_widget.ui
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.r2h_widget.catalog.WidgetCatalog
+import com.r2h_widget.catalog.WidgetDefinition
+import com.r2h_widget.catalog.WidgetProductIds
+import com.r2h_widget.data.FavoritesRepository
+import com.r2h_widget.data.InMemoryFavoritesRepository
+import com.r2h_widget.data.InMemoryWidgetPresetRepository
+import com.r2h_widget.data.WidgetPresetRepository
+import com.r2h_widget.data.InMemoryWidgetInstanceRepository
+import com.r2h_widget.data.WidgetInstanceRepository
+import com.r2h_widget.data.InMemoryTypedWidgetInstanceRepository
+import com.r2h_widget.data.TypedWidgetConfiguration
+import com.r2h_widget.data.TypedWidgetInstanceRepository
+import com.r2h_widget.widget.analog.AnalogClockConfiguration
+import com.r2h_widget.widget.battery.BatteryWidgetConfiguration
+import com.r2h_widget.widget.search.SearchWidgetConfiguration
+import com.r2h_widget.widget.weather.WeatherWidgetConfiguration
+import com.r2h_widget.widget.clock.ClockAccent
+import com.r2h_widget.widget.clock.ClockPresetCatalog
+import com.r2h_widget.widget.clock.DigitalClockConfiguration
+import com.r2h_widget.widget.common.WidgetSizeClass
+import com.r2h_widget.widget.clock.ClockWidgetPreset
+import com.r2h_widget.widget.clock.defaultClockConfiguration
+import com.r2h_widget.widget.pinning.WidgetPinningResult
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+data class WidgetDetailsUiState(
+    val widgetId: String? = null,
+    val appWidgetId: Int? = null,
+    val definition: WidgetDefinition? = null,
+    val configuration: DigitalClockConfiguration = DigitalClockConfiguration(),
+    val analogConfiguration: AnalogClockConfiguration = AnalogClockConfiguration(),
+    val batteryConfiguration: BatteryWidgetConfiguration = BatteryWidgetConfiguration(),
+    val weatherConfiguration: WeatherWidgetConfiguration = WeatherWidgetConfiguration(),
+    val searchConfiguration: SearchWidgetConfiguration = SearchWidgetConfiguration(),
+    val isFavorite: Boolean = false,
+    val pinningResult: WidgetPinningResult? = null,
+    val errorMessage: String? = null,
+    val selectedSection: WidgetStudioSection = WidgetStudioSection.STYLES,
+    val selectedMoreSection: WidgetStudioMoreSection = WidgetStudioMoreSection.BACKGROUND,
+    val selectedAnalogSection: AnalogStudioSection = AnalogStudioSection.FACE,
+    val previewSizeClass: WidgetSizeClass = WidgetSizeClass.MEDIUM,
+    val recentColors: List<String> = emptyList(),
+    val customPresets: List<ClockWidgetPreset> = emptyList(),
+)
+
+enum class WidgetStudioSection(val label: String) {
+    STYLES("Styles"),
+    TIME("Time"),
+    DATE("Date"),
+    LAYOUT("Layout"),
+    MORE("More"),
+}
+
+enum class WidgetStudioMoreSection(val label: String) {
+    BACKGROUND("Background"),
+    EFFECTS("Effects"),
+    ACTIONS("Actions"),
+    ADVANCED("Advanced"),
+}
+
+/** Sections inside the analog clock studio. */
+enum class AnalogStudioSection(val label: String) {
+    FACE("Face"),
+    HANDS("Hands"),
+    DATE("Date"),
+    LAYOUT("Layout"),
+    MORE("More"),
+}
+
+sealed interface WidgetDetailsAction {
+    data class Set24HourFormat(val enabled: Boolean) : WidgetDetailsAction
+    data class SetShowDate(val enabled: Boolean) : WidgetDetailsAction
+    data class SetShowWeekday(val enabled: Boolean) : WidgetDetailsAction
+    data class SetAccent(val accent: ClockAccent) : WidgetDetailsAction
+    data class SetConfiguration(val configuration: DigitalClockConfiguration) : WidgetDetailsAction
+    data class SetAnalogConfiguration(val configuration: AnalogClockConfiguration) : WidgetDetailsAction
+    data class SetBatteryConfiguration(val configuration: BatteryWidgetConfiguration) : WidgetDetailsAction
+    data class SetWeatherConfiguration(val configuration: WeatherWidgetConfiguration) : WidgetDetailsAction
+    data class SetSearchConfiguration(val configuration: SearchWidgetConfiguration) : WidgetDetailsAction
+    data class ApplyPreset(val presetId: String) : WidgetDetailsAction
+    data class SaveCustomPreset(val name: String) : WidgetDetailsAction
+    data class DeleteCustomPreset(val presetId: String) : WidgetDetailsAction
+    data class SelectSection(val section: WidgetStudioSection) : WidgetDetailsAction
+    data class SelectMoreSection(val section: WidgetStudioMoreSection) : WidgetDetailsAction
+    data class SelectAnalogSection(val section: AnalogStudioSection) : WidgetDetailsAction
+    data class SetPreviewSizeClass(val sizeClass: WidgetSizeClass) : WidgetDetailsAction
+    data object ToggleFavorite : WidgetDetailsAction
+    data class PinningCompleted(val result: WidgetPinningResult) : WidgetDetailsAction
+}
+
+class WidgetDetailsViewModel(
+    private val favoritesRepository: FavoritesRepository = InMemoryFavoritesRepository(),
+    private val widgetInstanceRepository: WidgetInstanceRepository = InMemoryWidgetInstanceRepository(),
+    private val typedWidgetInstanceRepository: TypedWidgetInstanceRepository = InMemoryTypedWidgetInstanceRepository(),
+    private val presetRepository: WidgetPresetRepository = InMemoryWidgetPresetRepository(),
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(WidgetDetailsUiState())
+    val uiState: StateFlow<WidgetDetailsUiState> = _uiState.asStateFlow()
+    private var currentWidgetId: String? = null
+
+    init {
+        viewModelScope.launch {
+            favoritesRepository.favoriteIds.collect { favoriteIds ->
+                _uiState.update { state ->
+                    state.copy(isFavorite = state.widgetId?.let(favoriteIds::contains) == true)
+                }
+            }
+        }
+        viewModelScope.launch {
+            presetRepository.customPresets.collect { presets ->
+                _uiState.update { it.copy(customPresets = presets) }
+            }
+        }
+    }
+
+    fun openWidget(widgetId: String, appWidgetId: Int? = null) {
+        val canonicalId = WidgetProductIds.canonicalize(widgetId)
+        if (currentWidgetId == canonicalId && _uiState.value.widgetId == canonicalId && _uiState.value.appWidgetId == appWidgetId) return
+        currentWidgetId = canonicalId
+        val definition = WidgetCatalog.findById(canonicalId)
+        _uiState.value = if (definition == null) {
+            WidgetDetailsUiState(
+                widgetId = canonicalId,
+                appWidgetId = appWidgetId,
+                errorMessage = "This widget is no longer available.",
+            )
+        } else {
+            WidgetDetailsUiState(
+                widgetId = canonicalId,
+                appWidgetId = appWidgetId,
+                definition = definition,
+                configuration = definition.defaultClockConfiguration(),
+                analogConfiguration = AnalogClockConfiguration(),
+                batteryConfiguration = BatteryWidgetConfiguration(),
+                weatherConfiguration = WeatherWidgetConfiguration(),
+                searchConfiguration = SearchWidgetConfiguration(),
+                previewSizeClass = defaultPreviewSizeClass(definition),
+            )
+        }
+        if (definition != null && appWidgetId != null) {
+            loadPersistedInstance(canonicalId, definition, appWidgetId)
+        }
+    }
+
+    private fun defaultPreviewSizeClass(definition: WidgetDefinition) = when (definition.size) {
+        com.r2h_widget.catalog.WidgetSize.TWO_BY_ONE -> WidgetSizeClass.COMPACT
+        else -> WidgetSizeClass.MEDIUM
+    }
+
+    private fun loadPersistedInstance(canonicalId: String, definition: WidgetDefinition, appWidgetId: Int) {
+        viewModelScope.launch {
+            if (definition.homeWidgetAvailability == com.r2h_widget.catalog.HomeWidgetAvailability.DIGITAL_CLOCK) {
+                val instance = widgetInstanceRepository.get(appWidgetId) ?: return@launch
+                if (WidgetProductIds.canonicalize(instance.productId) != canonicalId) return@launch
+                if (_uiState.value.widgetId == canonicalId && _uiState.value.appWidgetId == appWidgetId) {
+                    _uiState.update { it.copy(configuration = instance.configuration) }
+                }
+                return@launch
+            }
+            val instance = typedWidgetInstanceRepository.get(appWidgetId) ?: return@launch
+            if (WidgetProductIds.canonicalize(instance.productId) != canonicalId) return@launch
+            if (_uiState.value.widgetId != canonicalId || _uiState.value.appWidgetId != appWidgetId) return@launch
+            when (val configuration = instance.configuration) {
+                is TypedWidgetConfiguration.Battery -> _uiState.update { it.copy(batteryConfiguration = configuration.value) }
+                is TypedWidgetConfiguration.Weather -> _uiState.update { it.copy(weatherConfiguration = configuration.value) }
+                is TypedWidgetConfiguration.Analog -> _uiState.update { it.copy(analogConfiguration = configuration.value) }
+                is TypedWidgetConfiguration.Search -> _uiState.update { it.copy(searchConfiguration = configuration.value) }
+                is TypedWidgetConfiguration.Calendar -> Unit
+            }
+        }
+    }
+
+    fun onAction(action: WidgetDetailsAction) {
+        when (action) {
+            is WidgetDetailsAction.Set24HourFormat -> updateConfiguration {
+                with24HourFormat(action.enabled)
+            }
+
+            is WidgetDetailsAction.SetShowDate -> updateConfiguration {
+                withShowDate(action.enabled)
+            }
+
+            is WidgetDetailsAction.SetShowWeekday -> updateConfiguration {
+                withShowWeekday(action.enabled)
+            }
+
+            is WidgetDetailsAction.SetAccent -> updateConfiguration {
+                withAccent(action.accent)
+            }
+
+            is WidgetDetailsAction.SetConfiguration -> {
+                val colors = listOf(
+                    action.configuration.typography.timeColorHex,
+                    action.configuration.typography.dateColorHex,
+                    action.configuration.background.highlightColorHex,
+                )
+                _uiState.update { state ->
+                    state.copy(
+                        configuration = action.configuration.copy(presetId = null),
+                        recentColors = (colors + state.recentColors).distinct().take(8),
+                    )
+                }
+            }
+
+            is WidgetDetailsAction.SetAnalogConfiguration -> _uiState.update {
+                it.copy(analogConfiguration = action.configuration)
+            }
+
+            is WidgetDetailsAction.SetBatteryConfiguration -> _uiState.update {
+                it.copy(batteryConfiguration = action.configuration)
+            }
+
+            is WidgetDetailsAction.SetWeatherConfiguration -> _uiState.update {
+                it.copy(weatherConfiguration = action.configuration)
+            }
+
+            is WidgetDetailsAction.SetSearchConfiguration -> _uiState.update {
+                it.copy(searchConfiguration = action.configuration)
+            }
+
+            is WidgetDetailsAction.ApplyPreset -> {
+                val preset = ClockPresetCatalog.findById(action.presetId)
+                    ?: _uiState.value.customPresets.firstOrNull { it.id == action.presetId }
+                    ?: return
+                val colors = listOf(
+                    preset.configuration.typography.timeColorHex,
+                    preset.configuration.typography.dateColorHex,
+                    preset.configuration.background.highlightColorHex,
+                )
+                _uiState.update { state ->
+                    state.copy(
+                        configuration = preset.configuration,
+                        recentColors = (colors + state.recentColors).distinct().take(8),
+                    )
+                }
+            }
+
+            is WidgetDetailsAction.SaveCustomPreset -> {
+                val name = action.name.trim().take(32)
+                if (name.isBlank()) return
+                val id = "custom-${name.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')}-${System.currentTimeMillis()}"
+                viewModelScope.launch {
+                    presetRepository.save(
+                        ClockWidgetPreset(
+                            id = id,
+                            name = name,
+                            configuration = _uiState.value.configuration.copy(presetId = id),
+                        ),
+                    )
+                }
+            }
+
+            is WidgetDetailsAction.DeleteCustomPreset -> viewModelScope.launch {
+                presetRepository.delete(action.presetId)
+            }
+
+            is WidgetDetailsAction.SelectSection -> _uiState.update {
+                it.copy(selectedSection = action.section)
+            }
+
+            is WidgetDetailsAction.SelectMoreSection -> _uiState.update {
+                it.copy(selectedMoreSection = action.section)
+            }
+
+            is WidgetDetailsAction.SelectAnalogSection -> _uiState.update {
+                it.copy(selectedAnalogSection = action.section)
+            }
+
+            is WidgetDetailsAction.SetPreviewSizeClass -> _uiState.update {
+                it.copy(previewSizeClass = action.sizeClass)
+            }
+
+            WidgetDetailsAction.ToggleFavorite -> {
+                val id = _uiState.value.widgetId ?: return
+                viewModelScope.launch { favoritesRepository.toggleFavorite(id) }
+            }
+
+            is WidgetDetailsAction.PinningCompleted -> _uiState.update {
+                it.copy(pinningResult = action.result)
+            }
+        }
+    }
+
+    private fun updateConfiguration(
+        transform: DigitalClockConfiguration.() -> DigitalClockConfiguration,
+    ) {
+        _uiState.update { state -> state.copy(configuration = state.configuration.transform()) }
+    }
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\ui\widgets\DigitalClockPreview.kt ================
+
+package com.r2h_widget.ui.widgets
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
+import com.r2h_widget.catalog.WidgetDefinition
+import com.r2h_widget.ui.theme.AppSpacing
+import com.r2h_widget.ui.theme.TextSecondary
+import com.r2h_widget.widget.clock.ClockFormatter
+import com.r2h_widget.widget.clock.ClockDateAlignment
+import com.r2h_widget.widget.clock.ClockDatePlacement
+import com.r2h_widget.widget.clock.ClockStyleResolver
+import com.r2h_widget.widget.clock.ClockTimeAlignment
+import com.r2h_widget.widget.clock.DigitalClockConfiguration
+import com.r2h_widget.widget.common.WidgetBackgroundFill
+import com.r2h_widget.widget.common.WidgetBackgroundShape
+import com.r2h_widget.widget.common.WidgetSizeClass
+import com.r2h_widget.widget.clock.defaultClockConfiguration
+import java.time.Instant
+import kotlinx.coroutines.delay
+
+@Composable
+fun DigitalClockPreview(
+    definition: WidgetDefinition,
+    modifier: Modifier = Modifier,
+    accent: Color,
+    configuration: DigitalClockConfiguration = definition.defaultClockConfiguration(),
+    sizeClass: WidgetSizeClass = WidgetSizeClass.MEDIUM,
+    live: Boolean = true,
+) {
+    var now by remember { mutableStateOf(Instant.now()) }
+    if (live) {
+        LaunchedEffect(configuration.content.showSeconds) {
+            while (true) {
+                now = Instant.now()
+                delay(if (configuration.content.showSeconds) 1_000L else 30_000L)
+            }
+        }
+    }
+    val display = ClockFormatter.format(
+        instant = now,
+        configuration = configuration,
+        zoneId = java.time.ZoneId.systemDefault(),
+        locale = java.util.Locale.getDefault(),
+    )
+    val resolved = ClockStyleResolver.resolve(configuration, sizeClass)
+    val background = configuration.background
+    val effects = configuration.effects
+    val backgroundColor = runCatching { Color(background.solidColorHex.toColorInt()) }
+        .getOrDefault(Color(0xFF101017))
+    val gradientStart = runCatching { Color(background.gradientStartHex.toColorInt()) }
+        .getOrDefault(backgroundColor)
+    val gradientEnd = runCatching { Color(background.gradientEndHex.toColorInt()) }
+        .getOrDefault(Color.Black)
+    val shape = when (background.shape) {
+        WidgetBackgroundShape.PILL -> RoundedCornerShape(999.dp)
+        WidgetBackgroundShape.SQUARE -> RoundedCornerShape(0.dp)
+        else -> RoundedCornerShape(background.cornerRadiusDp.dp)
+    }
+    val alignment = when (resolved.timeAlignment) {
+        ClockTimeAlignment.START -> Alignment.Start
+        ClockTimeAlignment.CENTER -> Alignment.CenterHorizontally
+        ClockTimeAlignment.END -> Alignment.End
+    }
+    val textAlignment = when (resolved.timeAlignment) {
+        ClockTimeAlignment.START -> TextAlign.Start
+        ClockTimeAlignment.CENTER -> TextAlign.Center
+        ClockTimeAlignment.END -> TextAlign.End
+    }
+    val dateTextAlignment = when (resolved.dateAlignment) {
+        ClockDateAlignment.START -> TextAlign.Start
+        ClockDateAlignment.CENTER -> TextAlign.Center
+        ClockDateAlignment.END -> TextAlign.End
+    }
+    val timeColor = Color(resolved.timeColor)
+    val timeFont = resolved.timeFontFamily.toComposeFontFamily()
+    val dateFont = resolved.dateFontFamily.toComposeFontFamily()
+    val dateItems = buildList {
+        if (resolved.isWeekdayVisible) {
+            add(PreviewDateItem(display.weekday, Color(resolved.weekdayColor)))
+        }
+        if (resolved.isDateVisible) {
+            add(PreviewDateItem(display.date, Color(resolved.dateColor)))
+        }
+    }
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .offset(
+                x = resolved.horizontalOffsetDp.dp,
+                y = resolved.verticalOffsetDp.dp,
+            )
+            .clip(shape)
+            .background(
+                when (background.fill) {
+                    WidgetBackgroundFill.TRANSPARENT -> Brush.linearGradient(listOf(Color.Transparent, Color.Transparent))
+                    WidgetBackgroundFill.SOLID -> Brush.linearGradient(
+                        listOf(backgroundColor.copy(alpha = background.solidOpacity * background.opacity), backgroundColor.copy(alpha = background.solidOpacity * background.opacity)),
+                    )
+                    WidgetBackgroundFill.LINEAR_GRADIENT -> Brush.linearGradient(
+                        listOf(gradientStart.copy(alpha = background.opacity), gradientEnd.copy(alpha = background.opacity)),
+                    )
+                    WidgetBackgroundFill.RADIAL_GRADIENT -> Brush.radialGradient(
+                        listOf(gradientStart.copy(alpha = background.opacity), gradientEnd.copy(alpha = background.opacity)),
+                    )
+                },
+            )
+            .drawWithCache {
+                val highlight = Brush.radialGradient(
+                    colors = listOf(
+                        runCatching { Color(background.highlightColorHex.toColorInt()) }
+                            .getOrDefault(Color.Transparent)
+                            .copy(alpha = background.highlightOpacity.coerceIn(0f, 1f)),
+                        Color.Transparent,
+                    ),
+                    center = Offset(size.width * 0.2f, size.height * 0.08f),
+                    radius = size.maxDimension * 0.82f,
+                )
+                onDrawWithContent {
+                    if (effects.glowEnabled && effects.glowStrength > 0f) {
+                        drawRect(
+                            Brush.radialGradient(
+                                colors = listOf(
+                                    runCatching { Color(effects.glowColorHex.toColorInt()) }
+                                        .getOrDefault(Color.Transparent)
+                                        .copy(alpha = effects.glowStrength.coerceIn(0f, 1f) * 0.45f),
+                                    Color.Transparent,
+                                ),
+                                center = Offset(size.width * 0.5f, size.height * 0.58f),
+                                radius = size.maxDimension * 0.72f,
+                            ),
+                        )
+                    }
+                    drawContent()
+                    if (background.highlightEnabled) drawRect(highlight)
+                }
+            }
+            .border(
+                width = if (background.borderEnabled) background.borderWidthDp.dp else 0.dp,
+                color = runCatching { Color(background.borderColorHex.toColorInt()) }
+                    .getOrDefault(Color.White)
+                    .copy(alpha = background.borderOpacity.coerceIn(0f, 1f)),
+                    shape = shape,
+            )
+            .padding(resolved.contentPaddingDp.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = alignment,
+            verticalArrangement = Arrangement.spacedBy(
+                resolved.timeDateGapDp.dp,
+                Alignment.CenterVertically,
+            ),
+        ) {
+            if (configuration.date.placement == ClockDatePlacement.TOP) {
+                PreviewDateRow(
+                    dateItems = dateItems,
+                    fontFamily = dateFont,
+                    textAlignment = dateTextAlignment,
+                    dateSizeSp = resolved.dateSizeSp,
+                    dateWeight = resolved.dateFontWeight,
+                )
+            }
+            Text(
+                text = display.time,
+                color = timeColor,
+                fontFamily = timeFont,
+                fontSize = resolved.timeSizeSp.sp,
+                lineHeight = (resolved.timeSizeSp * 40f / ClockStyleResolver.BASE_TIME_SIZE_SP).sp,
+                fontWeight = FontWeight(resolved.timeFontWeight.coerceIn(100, 900)),
+                letterSpacing = resolved.letterSpacing.sp,
+                textAlign = textAlignment,
+            )
+            if (configuration.date.placement == ClockDatePlacement.BOTTOM) {
+                PreviewDateRow(
+                    dateItems = dateItems,
+                    fontFamily = dateFont,
+                    textAlignment = dateTextAlignment,
+                    dateSizeSp = resolved.dateSizeSp,
+                    dateWeight = resolved.dateFontWeight,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PreviewDateRow(
+    dateItems: List<PreviewDateItem>,
+    fontFamily: FontFamily,
+    textAlignment: TextAlign,
+    dateSizeSp: Float,
+    dateWeight: Int,
+) {
+    if (dateItems.isNotEmpty()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = when (textAlignment) {
+                TextAlign.Start -> Arrangement.Start
+                TextAlign.Center -> Arrangement.Center
+                TextAlign.End -> Arrangement.End
+                else -> Arrangement.Start
+            },
+        ) {
+            dateItems.forEachIndexed { index, item ->
+                Text(
+                    modifier = Modifier.padding(
+                        start = if (index > 0) 8.dp else 0.dp,
+                    ),
+                    text = item.text,
+                    color = item.color,
+                    fontFamily = fontFamily,
+                    fontSize = dateSizeSp.sp,
+                    lineHeight = dateSizeSp.sp,
+                    fontWeight = FontWeight(
+                        if (index == 0) dateWeight.coerceIn(100, 900) else FontWeight.Normal.weight,
+                    ),
+                    textAlign = textAlignment,
+                )
+            }
+        }
+    }
+}
+
+private data class PreviewDateItem(
+    val text: String,
+    val color: Color,
+)
+
+@Composable
+fun FallbackPreview(definition: WidgetDefinition) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF101017))
+            .padding(AppSpacing.xl),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "${definition.category.label}\nPreview arriving next",
+            color = TextSecondary,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\ui\widgets\WidgetDetailsScreen.kt ================
+
+package com.r2h_widget.ui.widgets
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import com.r2h_widget.catalog.HomeWidgetAvailability
+import com.r2h_widget.catalog.WidgetDefinition
+import com.r2h_widget.ui.AnalogStudioSection
+import com.r2h_widget.ui.WidgetDetailsAction
+import com.r2h_widget.ui.WidgetDetailsUiState
+import com.r2h_widget.ui.WidgetStudioMoreSection
+import com.r2h_widget.ui.WidgetStudioSection
+import com.r2h_widget.ui.theme.AccentViolet
+import com.r2h_widget.ui.theme.AppCorners
+import com.r2h_widget.ui.theme.AppSpacing
+import com.r2h_widget.ui.theme.GlassOutline
+import com.r2h_widget.ui.theme.GlassSurface
+import com.r2h_widget.ui.theme.TextPrimary
+import com.r2h_widget.ui.theme.TextSecondary
+import com.r2h_widget.ui.theme.VoidBlack
+import com.r2h_widget.widget.analog.AnalogClockConfiguration
+import com.r2h_widget.widget.battery.BatteryStateReader
+import com.r2h_widget.widget.battery.BatteryWidgetConfiguration
+import com.r2h_widget.widget.clock.ClockDateFormatPreset
+import com.r2h_widget.widget.clock.ClockFontFamily
+import com.r2h_widget.widget.clock.ClockPresetCatalog
+import com.r2h_widget.widget.clock.DigitalClockConfiguration
+import com.r2h_widget.widget.common.WidgetSizeClass
+import com.r2h_widget.widget.pinning.WidgetPinningResult
+import com.r2h_widget.widget.search.SearchWidgetConfiguration
+import com.r2h_widget.widget.weather.WeatherWidgetConfiguration
+
+/**
+ * The studio behind every catalog product: a live preview above, the product's
+ * editor sections below, and one consistent Add / Apply action.
+ */
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun WidgetDetailsScreen(
+    state: WidgetDetailsUiState,
+    onBack: () -> Unit,
+    onAction: (WidgetDetailsAction) -> Unit,
+    onAddWidget: (String, DigitalClockConfiguration) -> WidgetPinningResult,
+    onSaveWidget: (Int, String, DigitalClockConfiguration) -> WidgetPinningResult = { _, _, _ ->
+        WidgetPinningResult.Unsupported
+    },
+    onAddAnalogWidget: (String, AnalogClockConfiguration) -> WidgetPinningResult = { _, _ -> WidgetPinningResult.Unsupported },
+    onSaveAnalogWidget: (Int, String, AnalogClockConfiguration) -> WidgetPinningResult = { _, _, _ -> WidgetPinningResult.Unsupported },
+    onAddBatteryWidget: (String, BatteryWidgetConfiguration) -> WidgetPinningResult = { _, _ -> WidgetPinningResult.Unsupported },
+    onSaveBatteryWidget: (Int, String, BatteryWidgetConfiguration) -> WidgetPinningResult = { _, _, _ -> WidgetPinningResult.Unsupported },
+    onAddWeatherWidget: (String, WeatherWidgetConfiguration) -> WidgetPinningResult = { _, _ -> WidgetPinningResult.Unsupported },
+    onSaveWeatherWidget: (Int, String, WeatherWidgetConfiguration) -> WidgetPinningResult = { _, _, _ -> WidgetPinningResult.Unsupported },
+    onAddSearchWidget: (String, SearchWidgetConfiguration) -> WidgetPinningResult = { _, _ -> WidgetPinningResult.Unsupported },
+    onSaveSearchWidget: (Int, String, SearchWidgetConfiguration) -> WidgetPinningResult = { _, _, _ -> WidgetPinningResult.Unsupported },
+) {
+    val definition = state.definition
+    var menuExpanded by remember { mutableStateOf(false) }
+    var savePresetDialogVisible by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    var pendingWeatherAdd by remember {
+        mutableStateOf<Pair<String, WeatherWidgetConfiguration>?>(null)
+    }
+    var showBackgroundLocationEducation by remember {
+        mutableStateOf(false)
+    }
+
+    fun hasForegroundLocationPermission(): Boolean =
+        context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED ||
+            context.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+
+    fun hasBackgroundLocationPermission(): Boolean =
+        context.checkSelfPermission(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+
+    fun completePendingWeatherPin() {
+        val pending = pendingWeatherAdd ?: return
+        pendingWeatherAdd = null
+
+        val result = onAddWeatherWidget(
+            pending.first,
+            pending.second,
+        )
+
+        onAction(WidgetDetailsAction.PinningCompleted(result))
+    }
+
+    fun failPendingWeatherPin(message: String) {
+        pendingWeatherAdd = null
+        onAction(
+            WidgetDetailsAction.PinningCompleted(
+                WidgetPinningResult.Failed(message),
+            ),
+        )
+    }
+
+    val backgroundLocationSettingsLauncher =
+        androidx.activity.compose.rememberLauncherForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+        ) {
+            if (hasBackgroundLocationPermission()) {
+                completePendingWeatherPin()
+            } else {
+                failPendingWeatherPin(
+                    "Background location is required for automatic weather updates when the app is closed.",
+                )
+            }
+        }
+
+    val foregroundLocationLauncher =
+        androidx.activity.compose.rememberLauncherForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+        ) { permissions ->
+            val foregroundGranted =
+                permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    permissions[android.Manifest.permission.ACCESS_COARSE_LOCATION] == true
+
+            if (!foregroundGranted) {
+                failPendingWeatherPin(
+                    "Location permission is required to use the Weather widget.",
+                )
+            } else if (hasBackgroundLocationPermission()) {
+                completePendingWeatherPin()
+            } else {
+                showBackgroundLocationEducation = true
+            }
+        }
+
+    fun beginWeatherPin(
+        productId: String,
+        configuration: WeatherWidgetConfiguration,
+    ) {
+        pendingWeatherAdd = productId to configuration
+
+        when {
+            !hasForegroundLocationPermission() -> {
+                foregroundLocationLauncher.launch(
+                    arrayOf(
+                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                    ),
+                )
+            }
+
+            hasBackgroundLocationPermission() -> {
+                completePendingWeatherPin()
+            }
+
+            else -> {
+                showBackgroundLocationEducation = true
+            }
+        }
+    }
+
+    if (showBackgroundLocationEducation) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = {
+                showBackgroundLocationEducation = false
+                failPendingWeatherPin(
+                    "Background location was not enabled.",
+                )
+            },
+            title = {
+                Text("Allow background location")
+            },
+            text = {
+                Text(
+                    "To keep the Weather widget updated as you move, " +
+                        "open Permissions > Location and choose “Allow all the time”.",
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        showBackgroundLocationEducation = false
+
+                        backgroundLocationSettingsLauncher.launch(
+                            android.content.Intent(
+                                android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                android.net.Uri.parse("package:${context.packageName}"),
+                            ),
+                        )
+                    },
+                ) {
+                    Text("Open settings")
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = {
+                        showBackgroundLocationEducation = false
+                        failPendingWeatherPin(
+                            "Background location was not enabled.",
+                        )
+                    },
+                ) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
+
+    Scaffold(
+        containerColor = VoidBlack,
+        topBar = {
+            TopAppBar(
+                title = { Text(definition?.displayName ?: "Widget Studio") },
+                navigationIcon = {
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier.semantics { contentDescription = "Back" },
+                    ) { Text("‹", color = TextPrimary, style = MaterialTheme.typography.headlineMedium) }
+                },
+                actions = {
+                    if (definition != null) {
+                        FavoriteButton(
+                            isFavorite = state.isFavorite,
+                            onToggle = { onAction(WidgetDetailsAction.ToggleFavorite) },
+                        )
+                        if (definition.homeWidgetAvailability == HomeWidgetAvailability.DIGITAL_CLOCK) {
+                            Box {
+                                IconButton(
+                                    onClick = { menuExpanded = true },
+                                    modifier = Modifier.semantics { contentDescription = "More options" },
+                                ) { Text("⋮", color = TextPrimary, style = MaterialTheme.typography.titleLarge) }
+                                DropdownMenu(
+                                    expanded = menuExpanded,
+                                    onDismissRequest = { menuExpanded = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Save current style") },
+                                        onClick = {
+                                            menuExpanded = false
+                                            savePresetDialogVisible = true
+                                        },
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
+            )
+        },
+        bottomBar = {
+            if (definition != null) {
+                Surface(color = VoidBlack, tonalElevation = 3.dp) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.sm),
+                        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                    ) {
+                        when (val result = state.pinningResult) {
+                            WidgetPinningResult.Requested -> Text(
+                                "Pin request sent. Finish adding it from your launcher.",
+                                color = TextSecondary,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            WidgetPinningResult.Unsupported -> Text(
+                                "Direct pinning is unavailable here. Add this widget from your launcher's widget picker.",
+                                color = TextSecondary,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            is WidgetPinningResult.Failed -> Text(result.message, color = TextSecondary)
+                            null -> Unit
+                        }
+                        val isEditingExisting = state.appWidgetId != null
+                        Button(
+                            onClick = {
+                                if (
+                                    definition.homeWidgetAvailability == HomeWidgetAvailability.WEATHER &&
+                                    state.appWidgetId == null
+                                ) {
+                                    beginWeatherPin(
+                                        definition.id,
+                                        state.weatherConfiguration,
+                                    )
+                                } else {
+                                    val result = when (definition.homeWidgetAvailability) {
+                                    HomeWidgetAvailability.DIGITAL_CLOCK -> state.appWidgetId?.let { appWidgetId ->
+                                        onSaveWidget(appWidgetId, definition.id, state.configuration)
+                                    } ?: onAddWidget(definition.id, state.configuration)
+
+                                    HomeWidgetAvailability.ANALOG_CLOCK -> state.appWidgetId?.let { appWidgetId ->
+                                        onSaveAnalogWidget(appWidgetId, definition.id, state.analogConfiguration)
+                                    } ?: onAddAnalogWidget(definition.id, state.analogConfiguration)
+
+                                    HomeWidgetAvailability.BATTERY -> state.appWidgetId?.let { appWidgetId ->
+                                        onSaveBatteryWidget(appWidgetId, definition.id, state.batteryConfiguration)
+                                    } ?: onAddBatteryWidget(definition.id, state.batteryConfiguration)
+
+                                    HomeWidgetAvailability.WEATHER -> state.appWidgetId?.let { appWidgetId ->
+                                        onSaveWeatherWidget(appWidgetId, definition.id, state.weatherConfiguration)
+                                    } ?: onAddWeatherWidget(definition.id, state.weatherConfiguration)
+
+                                    HomeWidgetAvailability.SEARCH -> state.appWidgetId?.let { appWidgetId ->
+                                        onSaveSearchWidget(appWidgetId, definition.id, state.searchConfiguration)
+                                    } ?: onAddSearchWidget(definition.id, state.searchConfiguration)
+
+                                    HomeWidgetAvailability.NONE -> WidgetPinningResult.Unsupported
+                                }
+                                    onAction(WidgetDetailsAction.PinningCompleted(result))
+                                }
+                            },
+                            enabled = definition.homeWidgetAvailability != HomeWidgetAvailability.NONE,
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                        ) { Text(if (isEditingExisting) "Apply Changes" else "Add Widget") }
+                    }
+                }
+            }
+        },
+    ) { innerPadding ->
+        if (definition == null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(AppSpacing.xxl),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
+            ) {
+                Text(state.errorMessage ?: "Widget unavailable", color = TextPrimary)
+                Button(onClick = onBack) { Text("Back to widgets") }
+            }
+            return@Scaffold
+        }
+
+        val listState = rememberLazyListState()
+        val showCompactPreview by remember {
+            derivedStateOf {
+                listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 180
+            }
+        }
+        val setConfiguration: (((DigitalClockConfiguration) -> DigitalClockConfiguration) -> Unit) = { transform ->
+            onAction(WidgetDetailsAction.SetConfiguration(transform(state.configuration)))
+        }
+        val setAnalogConfiguration: ((AnalogClockConfiguration) -> Unit) = { value ->
+            onAction(WidgetDetailsAction.SetAnalogConfiguration(value))
+        }
+        val realBatteryState = remember {
+            runCatching { BatteryStateReader.read(context) }.getOrNull()
+        }
+        val recentColors = state.recentColors.ifEmpty {
+            listOf(
+                definition.previewAccentHex,
+                state.batteryConfiguration.progressColorHex,
+                state.weatherConfiguration.temperatureColorHex,
+            ).distinct()
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                    start = AppSpacing.lg,
+                    end = AppSpacing.lg,
+                    top = AppSpacing.md,
+                    bottom = AppSpacing.xxl,
+                ),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
+            ) {
+                item(key = "full-preview") {
+                    StudioPreview(
+                        definition = definition,
+                        state = state,
+                        batteryState = realBatteryState,
+                        compact = false,
+                    )
+                }
+                if (definition.homeWidgetAvailability in listOf(
+                        HomeWidgetAvailability.DIGITAL_CLOCK,
+                        HomeWidgetAvailability.ANALOG_CLOCK,
+                    )
+                ) {
+                    item(key = "size-selector") {
+                        SizeSelector(state.previewSizeClass, onAction)
+                    }
+                }
+                item(key = "studio-heading") {
+                    Text(
+                        "Customize your ${definition.displayName.lowercase()}",
+                        color = TextPrimary,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+                item(key = "editor") {
+                    when (definition.homeWidgetAvailability) {
+                        HomeWidgetAvailability.DIGITAL_CLOCK -> DigitalClockStudio(
+                            state = state,
+                            onAction = onAction,
+                            setConfiguration = setConfiguration,
+                            recentColors = recentColors,
+                            onRequestSave = { savePresetDialogVisible = true },
+                        )
+
+                        HomeWidgetAvailability.ANALOG_CLOCK -> Column(
+                            verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
+                        ) {
+                            AnalogClockSectionTabs(
+                                selected = state.selectedAnalogSection,
+                                onSelected = { section ->
+                                    onAction(WidgetDetailsAction.SelectAnalogSection(section))
+                                },
+                            )
+                            AnalogClockEditor(
+                                section = state.selectedAnalogSection,
+                                configuration = state.analogConfiguration,
+                                recentColors = recentColors,
+                                setConfiguration = setAnalogConfiguration,
+                            )
+                        }
+
+                        HomeWidgetAvailability.BATTERY -> BatteryWidgetEditor(
+                            configuration = state.batteryConfiguration,
+                            recentColors = recentColors,
+                            setConfiguration = { value ->
+                                onAction(WidgetDetailsAction.SetBatteryConfiguration(value))
+                            },
+                        )
+
+                        HomeWidgetAvailability.WEATHER -> WeatherWidgetEditor(
+                            configuration = state.weatherConfiguration,
+                            recentColors = recentColors,
+                            setConfiguration = { value ->
+                                onAction(WidgetDetailsAction.SetWeatherConfiguration(value))
+                            },
+                        )
+
+                        HomeWidgetAvailability.SEARCH -> SearchWidgetEditor(
+                            configuration = state.searchConfiguration,
+                            recentColors = recentColors,
+                            setConfiguration = { value ->
+                                onAction(WidgetDetailsAction.SetSearchConfiguration(value))
+                            },
+                        )
+
+                        HomeWidgetAvailability.NONE -> Unit
+                    }
+                }
+            }
+            AnimatedVisibility(
+                visible = showCompactPreview,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.md)
+                    .animateContentSize(),
+            ) {
+                StudioPreview(
+                    definition = definition,
+                    state = state,
+                    batteryState = realBatteryState,
+                    compact = true,
+                )
+            }
+        }
+    }
+
+    if (savePresetDialogVisible) {
+        SavePresetDialog(
+            onDismiss = { savePresetDialogVisible = false },
+            onSave = { name ->
+                savePresetDialogVisible = false
+                onAction(WidgetDetailsAction.SaveCustomPreset(name))
+            },
+        )
+    }
+}
+
+@Composable
+private fun DigitalClockStudio(
+    state: WidgetDetailsUiState,
+    onAction: (WidgetDetailsAction) -> Unit,
+    setConfiguration: (((DigitalClockConfiguration) -> DigitalClockConfiguration) -> Unit),
+    recentColors: List<String>,
+    onRequestSave: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
+        PrimarySectionTabs(state.selectedSection, onAction)
+        if (state.selectedSection == WidgetStudioSection.MORE) {
+            MoreSectionTabs(state.selectedMoreSection, onAction)
+        }
+        when (state.selectedSection) {
+            WidgetStudioSection.STYLES -> PresetsEditor(
+                state = state,
+                onAction = onAction,
+                onRequestSave = onRequestSave,
+            )
+            WidgetStudioSection.TIME -> TimeEditor(state.configuration, recentColors, setConfiguration)
+            WidgetStudioSection.DATE -> DateEditor(state.configuration, recentColors, setConfiguration)
+            WidgetStudioSection.LAYOUT -> LayoutEditor(state.configuration, setConfiguration)
+            WidgetStudioSection.MORE -> when (state.selectedMoreSection) {
+                WidgetStudioMoreSection.BACKGROUND -> BackgroundEditorSection(
+                    background = state.configuration.background,
+                    effects = state.configuration.effects,
+                    recentColors = recentColors,
+                    showEffects = true,
+                    setBackground = { value ->
+                        onAction(
+                            WidgetDetailsAction.SetConfiguration(
+                                state.configuration.copy(background = value),
+                            ),
+                        )
+                    },
+                    setEffects = { value ->
+                        onAction(
+                            WidgetDetailsAction.SetConfiguration(
+                                state.configuration.copy(effects = value),
+                            ),
+                        )
+                    },
+                )
+                WidgetStudioMoreSection.EFFECTS -> EditorCard("Effects", "A little atmosphere goes a long way.") {
+                    ToggleControl("Glow", state.configuration.effects.glowEnabled) { value ->
+                        setConfiguration { it.copy(effects = it.effects.copy(glowEnabled = value)) }
+                    }
+                    if (state.configuration.effects.glowEnabled) {
+                        ColorProperty("Glow color", state.configuration.effects.glowColorHex, recentColors) { value ->
+                            setConfiguration { it.copy(effects = it.effects.copy(glowColorHex = value)) }
+                        }
+                        SliderControl("Strength", state.configuration.effects.glowStrength, 0f..1f, ::formatStudioPercent, step = 0.05f) { value ->
+                            setConfiguration { it.copy(effects = it.effects.copy(glowStrength = value)) }
+                        }
+                    }
+                }
+                WidgetStudioMoreSection.ACTIONS -> ActionsEditorSection(
+                    action = state.configuration.action,
+                    setAction = { value ->
+                        setConfiguration { it.copy(action = value) }
+                    },
+                )
+                WidgetStudioMoreSection.ADVANCED -> AdvancedEditor(state.configuration, setConfiguration)
+            }
+        }
+    }
+}
+
+@Composable
+private fun StudioPreview(
+    definition: WidgetDefinition,
+    state: WidgetDetailsUiState,
+    batteryState: com.r2h_widget.widget.battery.BatteryWidgetState?,
+    compact: Boolean,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(if (compact) 78.dp else 210.dp)
+            .clip(RoundedCornerShape(if (compact) AppCorners.button else AppCorners.card))
+            .border(1.dp, GlassOutline, RoundedCornerShape(if (compact) AppCorners.button else AppCorners.card))
+            .background(GlassSurface),
+    ) {
+        WidgetPreviewRenderer(
+            definition = definition,
+            configuration = state.configuration,
+            analogConfiguration = state.analogConfiguration,
+            batteryConfiguration = state.batteryConfiguration,
+            batteryState = batteryState,
+            weatherConfiguration = state.weatherConfiguration,
+            searchConfiguration = state.searchConfiguration,
+            sizeClass = state.previewSizeClass,
+        )
+    }
+}
+
+@Composable
+private fun SizeSelector(
+    selected: WidgetSizeClass,
+    onAction: (WidgetDetailsAction) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(AppCorners.button))
+            .background(GlassSurface)
+            .padding(AppSpacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+    ) {
+        listOf(
+            "2×1" to WidgetSizeClass.COMPACT,
+            "2×2" to WidgetSizeClass.MEDIUM,
+            "4×2" to WidgetSizeClass.EXPANDED,
+        ).forEach { (label, sizeClass) ->
+            Surface(
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 48.dp)
+                    .clip(RoundedCornerShape(AppCorners.button))
+                    .clickable { onAction(WidgetDetailsAction.SetPreviewSizeClass(sizeClass)) }
+                    .semantics {
+                        contentDescription = "Preview size $label"
+                        role = Role.Button
+                    },
+                color = if (selected == sizeClass) AccentViolet.copy(alpha = 0.22f) else androidx.compose.ui.graphics.Color.Transparent,
+            ) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Text(label, color = if (selected == sizeClass) TextPrimary else TextSecondary)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PrimarySectionTabs(selected: WidgetStudioSection, onAction: (WidgetDetailsAction) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(AppCorners.button))
+            .background(GlassSurface)
+            .padding(AppSpacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+    ) {
+        WidgetStudioSection.entries.forEach { section ->
+            StudioTab(
+                label = section.label,
+                selected = selected == section,
+                modifier = Modifier.weight(1f),
+                onClick = { onAction(WidgetDetailsAction.SelectSection(section)) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun MoreSectionTabs(selected: WidgetStudioMoreSection, onAction: (WidgetDetailsAction) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+    ) {
+        WidgetStudioMoreSection.entries.forEach { section ->
+            FilterChip(
+                selected = selected == section,
+                onClick = { onAction(WidgetDetailsAction.SelectMoreSection(section)) },
+                label = { Text(section.label, maxLines = 1) },
+            )
+        }
+    }
+}
+
+@Composable
+internal fun PresetsEditor(
+    state: WidgetDetailsUiState,
+    onAction: (WidgetDetailsAction) -> Unit,
+    onRequestSave: () -> Unit,
+) {
+    EditorCard("Styles", "Start with a mood, then make it yours.") {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+        ) {
+            ClockPresetCatalog.builtIn.forEach { preset ->
+                PresetPreviewCard(
+                    name = preset.name,
+                    selected = state.configuration.presetId == preset.id,
+                    configuration = preset.configuration,
+                    onClick = { onAction(WidgetDetailsAction.ApplyPreset(preset.id)) },
+                )
+            }
+        }
+        if (state.customPresets.isNotEmpty()) {
+            Text("Saved styles", color = TextSecondary, style = MaterialTheme.typography.labelMedium)
+            state.customPresets.forEach { preset ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 52.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(
+                        onClick = { onAction(WidgetDetailsAction.ApplyPreset(preset.id)) },
+                        modifier = Modifier.weight(1f),
+                    ) { Text(preset.name, color = TextPrimary, textAlign = androidx.compose.ui.text.style.TextAlign.Start) }
+                    TextButton(onClick = { onAction(WidgetDetailsAction.DeleteCustomPreset(preset.id)) }) {
+                        Text("Delete", color = TextSecondary)
+                    }
+                }
+            }
+        }
+        OutlinedButton(onClick = onRequestSave, modifier = Modifier.fillMaxWidth()) {
+            Text("Save current style")
+        }
+    }
+}
+
+@Composable
+private fun PresetPreviewCard(
+    name: String,
+    selected: Boolean,
+    configuration: DigitalClockConfiguration,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .width(156.dp)
+            .clip(RoundedCornerShape(AppCorners.button))
+            .background(if (selected) AccentViolet.copy(alpha = 0.14f) else com.r2h_widget.ui.theme.GlassSurfaceStrong)
+            .border(
+                width = if (selected) 2.dp else 1.dp,
+                color = if (selected) AccentViolet else GlassOutline,
+                shape = RoundedCornerShape(AppCorners.button),
+            )
+            .clickable(onClick = onClick, role = Role.Button)
+            .semantics {
+                contentDescription = "Preset $name"
+                role = Role.Button
+            }
+            .padding(AppSpacing.sm),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(88.dp)
+                .clip(RoundedCornerShape(AppCorners.button)),
+        ) {
+            WidgetPreviewRenderer(
+                definition = com.r2h_widget.catalog.WidgetCatalog.digitalClock,
+                configuration = configuration,
+                sizeClass = WidgetSizeClass.MEDIUM,
+                live = false,
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(name, color = TextPrimary, style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
+            if (selected) Text("✓", color = AccentViolet)
+        }
+    }
+}
+
+@Composable
+internal fun FontProperty(label: String, selected: ClockFontFamily, onSelected: (ClockFontFamily) -> Unit) {
+    var sheetVisible by remember { mutableStateOf(false) }
+    StudioPropertyRow(
+        label = label,
+        value = selected.label,
+        onClick = { sheetVisible = true },
+        sample = {
+            Text("Digital", color = TextSecondary, fontFamily = selected.toComposeFontFamily(), style = MaterialTheme.typography.labelSmall)
+        },
+    )
+    if (sheetVisible) {
+        FontPickerSheet(
+            initialValue = selected,
+            onDismiss = { sheetVisible = false },
+            onApply = onSelected,
+        )
+    }
+}
+
+@Composable
+internal fun DateFormatProperty(configuration: DigitalClockConfiguration, onSelected: (ClockDateFormatPreset) -> Unit) {
+    var sheetVisible by remember { mutableStateOf(false) }
+    StudioPropertyRow("Date format", configuration.date.formatPreset.label, onClick = { sheetVisible = true })
+    if (sheetVisible) {
+        DateFormatPickerSheet(
+            configuration = configuration,
+            initialValue = configuration.date.formatPreset,
+            onDismiss = { sheetVisible = false },
+            onApply = onSelected,
+        )
+    }
+}
+
+@Composable
+private fun SavePresetDialog(onDismiss: () -> Unit, onSave: (String) -> Unit) {
+    var name by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = com.r2h_widget.ui.theme.GlassSurfaceStrong,
+        title = { Text("Save current style", color = TextPrimary) },
+        text = {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it.take(32) },
+                label = { Text("Preset name") },
+                singleLine = true,
+            )
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        confirmButton = {
+            Button(onClick = { onSave(name) }, enabled = name.isNotBlank()) { Text("Save") }
+        },
+    )
+}
+
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\ui\widgets\WidgetGalleryScreen.kt ================
+
+package com.r2h_widget.ui.widgets
+
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.r2h_widget.catalog.WidgetCatalog
+import com.r2h_widget.catalog.WidgetCategory
+import com.r2h_widget.catalog.WidgetDefinition
+import com.r2h_widget.ui.theme.AccentViolet
+import com.r2h_widget.ui.theme.AppSpacing
+import com.r2h_widget.ui.theme.GlassOutline
+import com.r2h_widget.ui.theme.GlassSurface
+import com.r2h_widget.ui.theme.TextPrimary
+import com.r2h_widget.ui.theme.TextSecondary
+
+/**
+ * The simplified catalog: five base widgets, one per section. The chips filter by
+ * product family; the list itself never grows preset duplicates.
+ */
+@Composable
+fun WidgetGalleryScreen(
+    selectedCategory: WidgetCategory,
+    favoriteIds: Set<String>,
+    onCategorySelected: (WidgetCategory) -> Unit,
+    onWidgetSelected: (String) -> Unit,
+    onToggleFavorite: (String) -> Unit,
+) {
+    val products = WidgetCatalog.forCategory(selectedCategory)
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.padding(
+                start = AppSpacing.xxl,
+                end = AppSpacing.xxl,
+                top = AppSpacing.xxl,
+            ),
+        ) {
+            Text(
+                text = "Widgets",
+                color = TextPrimary,
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            Text(
+                text = "Five base widgets, each one fully yours.",
+                color = TextSecondary,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = AppSpacing.sm),
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = AppSpacing.xxl, vertical = AppSpacing.lg),
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+        ) {
+            WidgetCatalog.categories.forEach { category ->
+                FilterChip(
+                    selected = selectedCategory == category,
+                    onClick = { onCategorySelected(category) },
+                    label = { Text(category.label) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = AccentViolet.copy(alpha = 0.18f),
+                        selectedLabelColor = TextPrimary,
+                        containerColor = GlassSurface,
+                        labelColor = TextSecondary,
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = selectedCategory == category,
+                        borderColor = GlassOutline,
+                        selectedBorderColor = AccentViolet.copy(alpha = 0.58f),
+                    ),
+                )
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentPadding = PaddingValues(
+                start = AppSpacing.xxl,
+                end = AppSpacing.xxl,
+                bottom = AppSpacing.xxl,
+            ),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
+        ) {
+            items(
+                items = products,
+                key = WidgetDefinition::id,
+            ) { definition ->
+                WidgetPreviewCard(
+                    definition = definition,
+                    isFavorite = definition.id in favoriteIds,
+                    onToggleFavorite = { onToggleFavorite(definition.id) },
+                    onClick = { onWidgetSelected(definition.id) },
+                )
+            }
+        }
+    }
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\ui\widgets\WidgetPreviewCard.kt ================
+
+package com.r2h_widget.ui.widgets
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.r2h_widget.catalog.WidgetDefinition
+import com.r2h_widget.catalog.WidgetSize
+import com.r2h_widget.ui.theme.AccentViolet
+import com.r2h_widget.ui.theme.AppCorners
+import com.r2h_widget.ui.theme.AppSpacing
+import com.r2h_widget.ui.theme.GlassOutline
+import com.r2h_widget.ui.theme.GlassSurface
+import com.r2h_widget.ui.theme.TextMuted
+import com.r2h_widget.ui.theme.TextPrimary
+import com.r2h_widget.ui.theme.TextSecondary
+import com.r2h_widget.widget.battery.BatteryStateReader
+
+/**
+ * One wide feature card per product. The catalog shows five base widgets; each card
+ * carries a live representative preview — real battery state included — instead of a
+ * grid of near-identical presets.
+ */
+@Composable
+fun WidgetPreviewCard(
+    definition: WidgetDefinition,
+    modifier: Modifier = Modifier,
+    isFavorite: Boolean = false,
+    onToggleFavorite: () -> Unit = {},
+    onClick: () -> Unit = {},
+) {
+    // Real device battery level for the Battery card; other products don't need it.
+    val batteryState = if (definition.rendererKey == com.r2h_widget.catalog.WidgetPreviewRendererRegistry.BATTERY) {
+        val context = LocalContext.current
+        androidx.compose.runtime.remember { runCatching { BatteryStateReader.read(context) }.getOrNull() }
+    } else {
+        null
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(AppCorners.card))
+            .background(GlassSurface)
+            .border(1.dp, GlassOutline, RoundedCornerShape(AppCorners.card))
+            .clickable(
+                onClick = onClick,
+                role = Role.Button,
+            )
+            .semantics { role = Role.Button },
+    ) {
+        Box(modifier = Modifier.padding(AppSpacing.md)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(if (definition.size == WidgetSize.TWO_BY_ONE) 2.6f else 1.55f)
+                    .clip(RoundedCornerShape(AppCorners.button)),
+            ) {
+                WidgetPreviewRenderer(
+                    definition = definition,
+                    batteryState = batteryState,
+                    live = true,
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = AppSpacing.lg)
+                .padding(bottom = AppSpacing.md),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = definition.displayName,
+                    color = TextPrimary,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = definition.description,
+                    color = TextSecondary,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = AppSpacing.xs),
+                )
+                Row(
+                    modifier = Modifier.padding(top = AppSpacing.sm),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = definition.size.label,
+                        color = TextMuted,
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                    Spacer(Modifier.width(AppSpacing.sm))
+                    Box(
+                        modifier = Modifier
+                            .size(4.dp)
+                            .clip(RoundedCornerShape(2.dp))
+                            .background(AccentViolet.copy(alpha = 0.6f)),
+                    )
+                    Spacer(Modifier.width(AppSpacing.sm))
+                    Text(
+                        text = "Fully customizable",
+                        color = TextMuted,
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                }
+            }
+            FavoriteButton(
+                isFavorite = isFavorite,
+                onToggle = onToggleFavorite,
+            )
+        }
+    }
+}
+
+@Composable
+fun FavoriteButton(
+    isFavorite: Boolean = false,
+    onToggle: () -> Unit = {},
+) {
+    IconButton(
+        onClick = onToggle,
+        modifier = Modifier
+            .size(48.dp)
+            .semantics {
+                contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites"
+            },
+    ) {
+        Text(
+            text = if (isFavorite) "♥" else "♡",
+            color = if (isFavorite) AccentViolet else TextMuted,
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\ui\widgets\WidgetPreviewRenderer.kt ================
+
+package com.r2h_widget.ui.widgets
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
+import com.r2h_widget.catalog.WidgetDefinition
+import com.r2h_widget.catalog.WidgetPreviewRendererRegistry
+import com.r2h_widget.widget.analog.AnalogClockConfiguration
+import com.r2h_widget.widget.battery.BatteryWidgetConfiguration
+import com.r2h_widget.widget.battery.BatteryWidgetState
+import com.r2h_widget.widget.clock.DigitalClockConfiguration
+import com.r2h_widget.widget.clock.defaultClockConfiguration
+import com.r2h_widget.widget.common.WidgetSizeClass
+import com.r2h_widget.widget.search.SearchWidgetConfiguration
+import com.r2h_widget.widget.weather.WeatherWidgetConfiguration
+
+/**
+ * One preview renderer per product, resolved by the stable renderer registry key.
+ * Battery previews receive the caller's real [BatteryWidgetState]; every other
+ * product renders from its typed configuration.
+ */
+@Composable
+fun WidgetPreviewRenderer(
+    definition: WidgetDefinition,
+    modifier: Modifier = Modifier,
+    configuration: DigitalClockConfiguration = definition.defaultClockConfiguration(),
+    analogConfiguration: AnalogClockConfiguration = AnalogClockConfiguration(),
+    batteryConfiguration: BatteryWidgetConfiguration = BatteryWidgetConfiguration(),
+    batteryState: BatteryWidgetState? = null,
+    weatherConfiguration: WeatherWidgetConfiguration = WeatherWidgetConfiguration(),
+    searchConfiguration: SearchWidgetConfiguration = SearchWidgetConfiguration(),
+    sizeClass: WidgetSizeClass = WidgetSizeClass.MEDIUM,
+    live: Boolean = true,
+) {
+    val accent = runCatching { Color(configuration.accent.colorHex.toColorInt()) }
+        .getOrDefault(Color(0xFFA78BFA))
+    when (WidgetPreviewRendererRegistry.resolve(definition.rendererKey)) {
+        WidgetPreviewRendererRegistry.DIGITAL_CLOCK -> DigitalClockPreview(
+            definition = definition,
+            modifier = modifier,
+            accent = accent,
+            configuration = configuration,
+            sizeClass = sizeClass,
+            live = live,
+        )
+
+        WidgetPreviewRendererRegistry.ANALOG_CLOCK -> AnalogClockPreview(
+            modifier = modifier,
+            configuration = analogConfiguration,
+            live = live,
+        )
+
+        WidgetPreviewRendererRegistry.BATTERY -> BatteryPreview(
+            modifier = modifier,
+            configuration = batteryConfiguration,
+            state = batteryState ?: defaultBatteryPreviewState(),
+        )
+
+        WidgetPreviewRendererRegistry.WEATHER -> WeatherPreview(
+            modifier = modifier,
+            configuration = weatherConfiguration,
+        )
+
+        WidgetPreviewRendererRegistry.SEARCH -> SearchPreview(
+            modifier = modifier,
+            configuration = searchConfiguration,
+        )
+
+        else -> Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(accent.copy(alpha = 0.24f), Color.Transparent),
+                    ),
+                ),
+        ) { FallbackPreview(definition = definition) }
+    }
+}
+
+@Composable
+private fun defaultBatteryPreviewState(): BatteryWidgetState = BatteryWidgetState(
+    levelPercent = 73,
+    isCharging = false,
+    plugSource = com.r2h_widget.widget.battery.BatteryPlugSource.UNKNOWN,
+    isLow = false,
+)
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\widget\clock\DigitalClockConfiguration.kt ================
+
+package com.r2h_widget.widget.clock
+
+import com.r2h_widget.catalog.WidgetDefinition
+import com.r2h_widget.catalog.WidgetProductIds
+import com.r2h_widget.widget.common.WidgetActionConfiguration
+import com.r2h_widget.widget.common.WidgetActionType
+import com.r2h_widget.widget.common.WidgetBackgroundConfiguration
+import com.r2h_widget.widget.common.WidgetEffectsConfiguration
+import com.r2h_widget.widget.common.WidgetSizeClass
+
+enum class ClockAccent(
+    val label: String,
+    val colorHex: String,
+) {
+    VIOLET("Violet", "#A78BFA"),
+    CYAN("Cyan", "#38BDF8"),
+    MINT("Mint", "#34D399"),
+    AMBER("Amber", "#FBBF24"),
+    ROSE("Rose", "#FB7185");
+
+    companion object {
+        fun fromHex(value: String): ClockAccent = entries.firstOrNull {
+            it.colorHex.equals(value, ignoreCase = true)
+        } ?: VIOLET
+    }
+}
+
+enum class ClockTimeSeparator(val symbol: String) {
+    COLON(":"),
+    DOT("·"),
+    SPACE(" "),
+}
+
+enum class ClockTimeAlignment {
+    START,
+    CENTER,
+    END,
+}
+
+enum class ClockFontFamily(val label: String) {
+    SYSTEM("System"),
+    ROUNDED("Rounded"),
+    CONDENSED("Condensed"),
+    MONO("Mono"),
+    ELEGANT("Elegant"),
+    DIGITAL("Digital"),
+}
+
+enum class ClockDatePlacement {
+    TOP,
+    BOTTOM,
+}
+
+enum class ClockDateAlignment {
+    START,
+    CENTER,
+    END,
+}
+
+enum class ClockWeekdayStyle {
+    HIDDEN,
+    SHORT,
+    FULL,
+}
+
+enum class ClockMonthStyle {
+    NUMERIC,
+    SHORT_NAME,
+    FULL_NAME,
+}
+
+enum class ClockYearStyle {
+    HIDDEN,
+    TWO_DIGIT,
+    FOUR_DIGIT,
+}
+
+enum class ClockDateFormatPreset(val label: String) {
+    DAY_MONTH_YEAR("21 May 2026"),
+    MONTH_DAY_YEAR("May 21, 2026"),
+    ISO("2026-05-21"),
+    DAY_MONTH("21 May"),
+    MONTH_DAY("May 21"),
+}
+
+data class ClockContentConfiguration(
+    val use24HourFormat: Boolean = false,
+    val showAmPm: Boolean = true,
+    val leadingZero: Boolean = false,
+    val separator: ClockTimeSeparator = ClockTimeSeparator.COLON,
+    val showSeconds: Boolean = false,
+    val alignment: ClockTimeAlignment = ClockTimeAlignment.CENTER,
+)
+
+data class ClockDateConfiguration(
+    val enabled: Boolean = true,
+    val placement: ClockDatePlacement = ClockDatePlacement.BOTTOM,
+    val alignment: ClockDateAlignment = ClockDateAlignment.CENTER,
+    val weekdayStyle: ClockWeekdayStyle = ClockWeekdayStyle.FULL,
+    val monthStyle: ClockMonthStyle = ClockMonthStyle.SHORT_NAME,
+    val yearStyle: ClockYearStyle = ClockYearStyle.FOUR_DIGIT,
+    val formatPreset: ClockDateFormatPreset = ClockDateFormatPreset.DAY_MONTH_YEAR,
+)
+
+data class WidgetTypographyConfiguration(
+    val timeFontFamily: ClockFontFamily = ClockFontFamily.SYSTEM,
+    // Kept in persisted configurations for backward compatibility; weight editing remains
+    // unavailable until every bundled family has verified launcher-safe weight support.
+    val timeFontWeight: Int = 500,
+    val timeScale: Float = 1f,
+    val timeColorHex: String = ClockAccent.VIOLET.colorHex,
+    val letterSpacing: Float = 0f,
+    val dateFontFamily: ClockFontFamily = ClockFontFamily.SYSTEM,
+    val dateFontWeight: Int = 400,
+    val dateScale: Float = 0.34f,
+    val dateColorHex: String = "#FFFFFF",
+    val dateOpacity: Float = 0.72f,
+)
+
+data class WidgetLayoutConfiguration(
+    val contentPaddingDp: Float = 16f,
+    val horizontalOffsetDp: Float = 0f,
+    val verticalOffsetDp: Float = 0f,
+    val timeDateGapDp: Float = 6f,
+    val alignment: ClockTimeAlignment = ClockTimeAlignment.CENTER,
+)
+
+data class ResponsiveWidgetConfiguration(
+    val compactScale: Float = 0.82f,
+    val mediumScale: Float = 1f,
+    val expandedScale: Float = 1.16f,
+    val compactShowDate: Boolean = true,
+)
+
+/**
+ * Canonical typed configuration for the Digital Clock product and each of its widget
+ * instances. The scalar properties are read-only compatibility projections kept for
+ * persisted-record callers.
+ */
+data class DigitalClockConfiguration(
+    val content: ClockContentConfiguration,
+    val date: ClockDateConfiguration,
+    val background: WidgetBackgroundConfiguration = WidgetBackgroundConfiguration(),
+    val typography: WidgetTypographyConfiguration = WidgetTypographyConfiguration(),
+    val layout: WidgetLayoutConfiguration = WidgetLayoutConfiguration(),
+    val effects: WidgetEffectsConfiguration = WidgetEffectsConfiguration(),
+    val action: WidgetActionConfiguration = WidgetActionConfiguration(),
+    val responsive: ResponsiveWidgetConfiguration = ResponsiveWidgetConfiguration(),
+    val presetId: String? = null,
+) {
+    /** Compatibility constructor for the original foundation persistence/API shape. */
+    constructor(
+        use24HourFormat: Boolean = false,
+        showDate: Boolean = true,
+        showWeekday: Boolean = true,
+        accent: ClockAccent = ClockAccent.VIOLET,
+    ) : this(
+        content = ClockContentConfiguration(use24HourFormat = use24HourFormat),
+        date = ClockDateConfiguration(
+            enabled = showDate,
+            weekdayStyle = if (showWeekday) ClockWeekdayStyle.FULL else ClockWeekdayStyle.HIDDEN,
+        ),
+        typography = WidgetTypographyConfiguration(
+            timeColorHex = accent.colorHex,
+            dateColorHex = "#FFFFFF",
+        ),
+        effects = WidgetEffectsConfiguration(glowColorHex = accent.colorHex),
+        background = WidgetBackgroundConfiguration(highlightColorHex = accent.colorHex),
+    )
+
+    val use24HourFormat: Boolean
+        get() = content.use24HourFormat
+
+    val showDate: Boolean
+        get() = date.enabled
+
+    val showWeekday: Boolean
+        get() = date.weekdayStyle != ClockWeekdayStyle.HIDDEN
+
+    val accent: ClockAccent
+        get() = ClockAccent.fromHex(typography.timeColorHex)
+
+    fun with24HourFormat(enabled: Boolean): DigitalClockConfiguration = copy(
+        content = content.copy(use24HourFormat = enabled),
+    )
+
+    fun withShowDate(enabled: Boolean): DigitalClockConfiguration = copy(
+        date = date.copy(enabled = enabled),
+    )
+
+    fun withShowWeekday(enabled: Boolean): DigitalClockConfiguration = copy(
+        date = date.copy(
+            weekdayStyle = if (enabled) {
+                date.weekdayStyle.takeUnless { it == ClockWeekdayStyle.HIDDEN } ?: ClockWeekdayStyle.FULL
+            } else {
+                ClockWeekdayStyle.HIDDEN
+            },
+        ),
+    )
+
+    fun withAccent(accent: ClockAccent): DigitalClockConfiguration = copy(
+        typography = typography.copy(timeColorHex = accent.colorHex),
+        effects = effects.copy(glowColorHex = accent.colorHex),
+        background = background.copy(highlightColorHex = accent.colorHex),
+    )
+}
+
+typealias ClockWidgetConfiguration = DigitalClockConfiguration
+
+/**
+ * Every digital clock starts from the same strong default; the studio's style
+ * presets are the starting points users used to get from duplicate catalog entries.
+ */
+fun WidgetDefinition.defaultClockConfiguration(): DigitalClockConfiguration = when (id) {
+    WidgetProductIds.DIGITAL_CLOCK -> DigitalClockConfiguration(
+        accent = ClockAccent.fromHex(previewAccentHex),
+    ).copy(
+        typography = WidgetTypographyConfiguration(
+            timeColorHex = previewAccentHex,
+        ),
+        effects = WidgetEffectsConfiguration(glowColorHex = previewAccentHex),
+        background = WidgetBackgroundConfiguration(highlightColorHex = previewAccentHex),
+    )
+    else -> DigitalClockConfiguration()
+}
+
+
+================ E:\Projects\R2H-Android\R2H-Widget\app\src\main\java\com\r2h_widget\widget\pinning\WidgetPinning.kt ================
+
+package com.r2h_widget.widget.pinning
+
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import com.r2h_widget.catalog.HomeWidgetAvailability
+import com.r2h_widget.catalog.WidgetCatalog
+import com.r2h_widget.catalog.WidgetProductIds
+import com.r2h_widget.data.AppDependencies
+import com.r2h_widget.data.TypedWidgetConfiguration
+import com.r2h_widget.data.TypedWidgetInstance
+import com.r2h_widget.data.TypedWidgetInstanceCodec
+import com.r2h_widget.data.WidgetInstance
+import com.r2h_widget.data.WidgetInstanceCodec
+import com.r2h_widget.widget.analog.AnalogClockConfiguration
+import com.r2h_widget.widget.analog.AnalogClockRemoteViewsRenderer
+import com.r2h_widget.widget.analog.AnalogClockWidgetReceiver
+import com.r2h_widget.widget.battery.BatteryWidgetConfiguration
+import com.r2h_widget.widget.battery.BatteryMonitorService
+import com.r2h_widget.widget.battery.BatteryWidgetReceiver
+import com.r2h_widget.widget.battery.BatteryWidgetRenderer
+import com.r2h_widget.widget.clock.DigitalClockConfiguration
+import com.r2h_widget.widget.clock.DigitalClockRemoteViewsRenderer
+import com.r2h_widget.widget.clock.DigitalClockWidgetReceiver
+import com.r2h_widget.widget.search.SearchWidgetConfiguration
+import com.r2h_widget.widget.search.SearchWidgetReceiver
+import com.r2h_widget.widget.search.SearchWidgetRenderer
+import com.r2h_widget.widget.weather.WeatherWidgetConfiguration
+import com.r2h_widget.widget.weather.WeatherLocationService
+import com.r2h_widget.widget.weather.WeatherWidgetReceiver
+import com.r2h_widget.widget.weather.WeatherWidgetRenderer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+
+sealed interface WidgetPinningResult {
+    data object Requested : WidgetPinningResult
+    data object Unsupported : WidgetPinningResult
+    data class Failed(val message: String) : WidgetPinningResult
+}
+
+interface WidgetPinningController {
+    fun requestDigitalClockPin(
+        productId: String,
+        configuration: com.r2h_widget.widget.clock.DigitalClockConfiguration,
+    ): WidgetPinningResult
+
+    fun updateDigitalClock(
+        appWidgetId: Int,
+        productId: String,
+        configuration: DigitalClockConfiguration,
+    ): WidgetPinningResult = WidgetPinningResult.Unsupported
+
+    fun requestAnalogClockPin(productId: String, configuration: AnalogClockConfiguration): WidgetPinningResult =
+        WidgetPinningResult.Unsupported
+
+    fun updateAnalogClock(
+        appWidgetId: Int,
+        productId: String,
+        configuration: AnalogClockConfiguration,
+    ): WidgetPinningResult = WidgetPinningResult.Unsupported
+
+    fun requestBatteryPin(productId: String, configuration: BatteryWidgetConfiguration): WidgetPinningResult =
+        WidgetPinningResult.Unsupported
+
+    fun updateBattery(
+        appWidgetId: Int,
+        productId: String,
+        configuration: BatteryWidgetConfiguration,
+    ): WidgetPinningResult = WidgetPinningResult.Unsupported
+
+    fun requestWeatherPin(productId: String, configuration: WeatherWidgetConfiguration): WidgetPinningResult =
+        WidgetPinningResult.Unsupported
+
+    fun updateWeather(
+        appWidgetId: Int,
+        productId: String,
+        configuration: WeatherWidgetConfiguration,
+    ): WidgetPinningResult = WidgetPinningResult.Unsupported
+
+    fun requestSearchPin(productId: String, configuration: SearchWidgetConfiguration): WidgetPinningResult =
+        WidgetPinningResult.Unsupported
+
+    fun updateSearch(
+        appWidgetId: Int,
+        productId: String,
+        configuration: SearchWidgetConfiguration,
+    ): WidgetPinningResult = WidgetPinningResult.Unsupported
+}
+
+class AndroidWidgetPinningController(
+    private val context: Context,
+) : WidgetPinningController {
+    override fun requestDigitalClockPin(
+        productId: String,
+        configuration: DigitalClockConfiguration,
+    ): WidgetPinningResult {
+        return requestPin(
+            productId = productId,
+            availability = HomeWidgetAvailability.DIGITAL_CLOCK,
+            provider = DigitalClockWidgetReceiver::class.java,
+            configurationPayload = WidgetInstanceCodec.encode(WidgetInstance(0, productId, configuration)),
+            preview = DigitalClockRemoteViewsRenderer.render(context, configuration),
+        )
+    }
+
+    override fun updateDigitalClock(
+        appWidgetId: Int,
+        productId: String,
+        configuration: DigitalClockConfiguration,
+    ): WidgetPinningResult {
+        val definition = WidgetCatalog.findById(productId)
+        if (definition?.homeWidgetAvailability != HomeWidgetAvailability.DIGITAL_CLOCK) {
+            return WidgetPinningResult.Failed("This product is not a digital clock widget.")
+        }
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            AppDependencies(context).widgetInstanceRepository.save(
+                WidgetInstance(appWidgetId, productId, configuration),
+            )
+            DigitalClockWidgetReceiver.update(
+                context = context,
+                appWidgetId = appWidgetId,
+                productId = productId,
+                configuration = configuration,
+            )
+        }
+        return WidgetPinningResult.Requested
+    }
+
+    override fun requestAnalogClockPin(productId: String, configuration: AnalogClockConfiguration): WidgetPinningResult =
+        requestPin(
+            productId = productId,
+            availability = HomeWidgetAvailability.ANALOG_CLOCK,
+            provider = AnalogClockWidgetReceiver::class.java,
+            configurationPayload = TypedWidgetInstanceCodec.encode(
+                TypedWidgetInstance(0, productId, TypedWidgetConfiguration.Analog(configuration)),
+            ),
+            preview = AnalogClockRemoteViewsRenderer.render(context, configuration),
+        )
+
+    override fun updateAnalogClock(
+        appWidgetId: Int,
+        productId: String,
+        configuration: AnalogClockConfiguration,
+    ): WidgetPinningResult {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            AppDependencies(context).typedWidgetInstanceRepository.save(
+                TypedWidgetInstance(appWidgetId, productId, TypedWidgetConfiguration.Analog(configuration)),
+            )
+            AnalogClockWidgetReceiver.update(context, appWidgetId, configuration, productId)
+        }
+        return WidgetPinningResult.Requested
+    }
+
+    override fun requestBatteryPin(productId: String, configuration: BatteryWidgetConfiguration): WidgetPinningResult =
+        requestPin(
+            productId = productId,
+            availability = HomeWidgetAvailability.BATTERY,
+            provider = BatteryWidgetReceiver::class.java,
+            configurationPayload = TypedWidgetInstanceCodec.encode(
+                TypedWidgetInstance(0, productId, TypedWidgetConfiguration.Battery(configuration)),
+            ),
+            preview = BatteryWidgetRenderer.render(context, configuration),
+        )
+
+    override fun updateBattery(
+        appWidgetId: Int,
+        productId: String,
+        configuration: BatteryWidgetConfiguration,
+    ): WidgetPinningResult {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            AppDependencies(context).typedWidgetInstanceRepository.save(
+                TypedWidgetInstance(appWidgetId, productId, TypedWidgetConfiguration.Battery(configuration)),
+            )
+            BatteryWidgetReceiver.update(context, appWidgetId, configuration, productId)
+        }
+        return WidgetPinningResult.Requested
+    }
+
+    override fun requestWeatherPin(productId: String, configuration: WeatherWidgetConfiguration): WidgetPinningResult =
+        requestPin(
+            productId = productId,
+            availability = HomeWidgetAvailability.WEATHER,
+            provider = WeatherWidgetReceiver::class.java,
+            configurationPayload = TypedWidgetInstanceCodec.encode(
+                TypedWidgetInstance(0, productId, TypedWidgetConfiguration.Weather(configuration)),
+            ),
+            preview = WeatherWidgetRenderer.unavailablePreview(context, configuration),
+        )
+
+    override fun updateWeather(
+        appWidgetId: Int,
+        productId: String,
+        configuration: WeatherWidgetConfiguration,
+    ): WidgetPinningResult {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            AppDependencies(context).typedWidgetInstanceRepository.save(
+                TypedWidgetInstance(appWidgetId, productId, TypedWidgetConfiguration.Weather(configuration)),
+            )
+            WeatherWidgetReceiver.update(context, appWidgetId, configuration, productId)
+        }
+        return WidgetPinningResult.Requested
+    }
+
+    override fun requestSearchPin(productId: String, configuration: SearchWidgetConfiguration): WidgetPinningResult =
+        requestPin(
+            productId = productId,
+            availability = HomeWidgetAvailability.SEARCH,
+            provider = SearchWidgetReceiver::class.java,
+            configurationPayload = TypedWidgetInstanceCodec.encode(
+                TypedWidgetInstance(0, productId, TypedWidgetConfiguration.Search(configuration)),
+            ),
+            preview = SearchWidgetRenderer.render(context, configuration),
+        )
+
+    override fun updateSearch(
+        appWidgetId: Int,
+        productId: String,
+        configuration: SearchWidgetConfiguration,
+    ): WidgetPinningResult {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            AppDependencies(context).typedWidgetInstanceRepository.save(
+                TypedWidgetInstance(appWidgetId, productId, TypedWidgetConfiguration.Search(configuration)),
+            )
+            SearchWidgetReceiver.update(context, appWidgetId, configuration, productId)
+        }
+        return WidgetPinningResult.Requested
+    }
+
+    private fun requestPin(
+        productId: String,
+        availability: HomeWidgetAvailability,
+        provider: Class<out android.appwidget.AppWidgetProvider>,
+        configurationPayload: String,
+        preview: android.widget.RemoteViews,
+    ): WidgetPinningResult {
+        val definition = WidgetCatalog.findById(productId)
+        if (definition?.homeWidgetAvailability != availability) {
+            return WidgetPinningResult.Failed("This product is not available as a home widget.")
+        }
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        if (!appWidgetManager.isRequestPinAppWidgetSupported) return WidgetPinningResult.Unsupported
+
+        val callbackIntent = Intent(context, WidgetPinSuccessReceiver::class.java)
+            .putExtra(EXTRA_PRODUCT_ID, productId)
+            .putExtra(
+                if (availability == HomeWidgetAvailability.DIGITAL_CLOCK) EXTRA_CONFIGURATION else EXTRA_TYPED_CONFIGURATION,
+                configurationPayload,
+            )
+        val callback = PendingIntent.getBroadcast(
+            context,
+            configurationPayload.hashCode(),
+            callbackIntent,
+            // requestPinAppWidget fills EXTRA_APPWIDGET_ID into this callback.
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+        )
+        val extras = Bundle().apply {
+            putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PREVIEW, preview)
+        }
+        return try {
+            if (appWidgetManager.requestPinAppWidget(ComponentName(context, provider), extras, callback)) {
+                WidgetPinningResult.Requested
+            } else {
+                WidgetPinningResult.Unsupported
+            }
+        } catch (exception: IllegalStateException) {
+            WidgetPinningResult.Failed(exception.message ?: "The launcher rejected the pin request.")
+        } catch (exception: SecurityException) {
+            WidgetPinningResult.Failed(exception.message ?: "The launcher rejected the pin request.")
+        }
+    }
+}
+
+class WidgetPinSuccessReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val appWidgetId = intent.getIntExtra(
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID,
+        )
+        if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) return
+
+        val productId = intent.getStringExtra(EXTRA_PRODUCT_ID)
+            ?: WidgetProductIds.DIGITAL_CLOCK
+        val definition = WidgetCatalog.findById(productId)
+
+        if (definition?.homeWidgetAvailability == HomeWidgetAvailability.BATTERY) {
+            BatteryMonitorService.start(context)
+        }
+
+        if (definition?.homeWidgetAvailability == HomeWidgetAvailability.WEATHER) {
+            try {
+                WeatherLocationService.start(context)
+            } catch (exception: SecurityException) {
+                android.util.Log.w(
+                    "WidgetPinSuccess",
+                    "Weather location service could not start because location permission is unavailable.",
+                    exception,
+                )
+            } catch (exception: android.app.ForegroundServiceStartNotAllowedException) {
+                android.util.Log.w(
+                    "WidgetPinSuccess",
+                    "Weather location service foreground start was rejected.",
+                    exception,
+                )
+            }
+        }
+
+        val pendingResult = goAsync()
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            try {
+                when (definition?.homeWidgetAvailability) {
+                    HomeWidgetAvailability.DIGITAL_CLOCK,
+                    null,
+                    -> {
+                        val instance = intent.getStringExtra(EXTRA_CONFIGURATION)
+                            ?.let { WidgetInstanceCodec.decode(appWidgetId, it) }
+                            ?: WidgetInstance(appWidgetId, productId, DigitalClockConfiguration())
+                        AppDependencies(context).widgetInstanceRepository.save(instance)
+                        DigitalClockWidgetReceiver.update(
+                            context = context,
+                            appWidgetId = appWidgetId,
+                            productId = instance.productId,
+                            configuration = instance.configuration,
+                        )
+                    }
+                    HomeWidgetAvailability.ANALOG_CLOCK -> {
+                        val instance = typedInstanceFrom(
+                            intent,
+                            appWidgetId,
+                            productId,
+                        ) { TypedWidgetConfiguration.Analog(AnalogClockConfiguration()) }
+                        val configuration = (instance.configuration as? TypedWidgetConfiguration.Analog)?.value
+                            ?: AnalogClockConfiguration()
+                        AppDependencies(context).typedWidgetInstanceRepository.save(instance)
+                        AnalogClockWidgetReceiver.update(context, appWidgetId, configuration, instance.productId)
+                    }
+                    HomeWidgetAvailability.BATTERY -> {
+                        val instance = typedInstanceFrom(
+                            intent,
+                            appWidgetId,
+                            productId,
+                        ) { TypedWidgetConfiguration.Battery(BatteryWidgetConfiguration()) }
+                        val configuration = (instance.configuration as? TypedWidgetConfiguration.Battery)?.value
+                            ?: BatteryWidgetConfiguration()
+                        AppDependencies(context).typedWidgetInstanceRepository.save(instance)
+                        BatteryWidgetReceiver.update(context, appWidgetId, configuration, instance.productId)
+                    }
+                    HomeWidgetAvailability.WEATHER -> {
+                        val instance = typedInstanceFrom(
+                            intent,
+                            appWidgetId,
+                            productId,
+                        ) { TypedWidgetConfiguration.Weather(WeatherWidgetConfiguration()) }
+                        val configuration = (instance.configuration as? TypedWidgetConfiguration.Weather)?.value
+                            ?: WeatherWidgetConfiguration()
+                        AppDependencies(context).typedWidgetInstanceRepository.save(instance)
+                        WeatherWidgetReceiver.update(context, appWidgetId, configuration, instance.productId)
+                    }
+                    HomeWidgetAvailability.SEARCH -> {
+                        val instance = typedInstanceFrom(
+                            intent,
+                            appWidgetId,
+                            productId,
+                        ) { TypedWidgetConfiguration.Search(SearchWidgetConfiguration()) }
+                        val configuration = (instance.configuration as? TypedWidgetConfiguration.Search)?.value
+                            ?: SearchWidgetConfiguration()
+                        AppDependencies(context).typedWidgetInstanceRepository.save(instance)
+                        SearchWidgetReceiver.update(context, appWidgetId, configuration, instance.productId)
+                    }
+                    HomeWidgetAvailability.NONE -> Unit
+                }
+            } finally {
+                pendingResult.finish()
+            }
+        }
+    }
+
+    private inline fun typedInstanceFrom(
+        intent: Intent,
+        appWidgetId: Int,
+        productId: String,
+        fallback: () -> TypedWidgetConfiguration,
+    ): TypedWidgetInstance = intent.getStringExtra(EXTRA_TYPED_CONFIGURATION)
+        ?.let { TypedWidgetInstanceCodec.decode(appWidgetId, it) }
+        ?: TypedWidgetInstance(appWidgetId, productId, fallback())
+}
+
+const val EXTRA_PRODUCT_ID = "com.r2h_widget.extra.PRODUCT_ID"
+const val EXTRA_CONFIGURATION = "com.r2h_widget.extra.CONFIGURATION"
+const val EXTRA_TYPED_CONFIGURATION = "com.r2h_widget.extra.TYPED_CONFIGURATION"
+
+
+

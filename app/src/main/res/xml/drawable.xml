@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><resources>
+
+
+    <!--<item component=":LAUNCHER_ACTION_APP_DRAWER" drawable="ic_allapps" />-->
+    <!--<item component=":BROWSER" drawable="browser3" />-->
+    <!--<item component=":SMS" drawable="smss" />-->
+    <!--<item component=":CALCULATOR" drawable="calculatorl" />-->
+    <!--<item component=":CALENDAR" drawable="calendar" />-->
+    <!--<item component=":CAMERA" drawable="google_camera" />-->
+    <!--<item component=":CLOCK" drawable="clockl" />-->
+    <!--<item-->
+    <!--component=":CONTACTS"-->
+    <!--drawable="contactsn" />-->
+    <!--<item component=":EMAIL" drawable="emaillol" />-->
+    <!--<item component=":GALLERY" drawable="galleryl" />-->
+    <!--<item component=":PHONE" drawable="phone" />-->
+
+
+<item drawable="ic_0001"/><item drawable="ic_0002"/><item drawable="ic_0003"/><item drawable="ic_0004"/><item drawable="ic_0005"/><item drawable="ic_0006"/><item drawable="ic_0007"/><item drawable="ic_0008"/><item drawable="ic_0009"/><item drawable="ic_0010"/><item drawable="ic_0011"/><item drawable="ic_0012"/><item drawable="ic_0013"/><item drawable="ic_0014"/><item drawable="ic_0015"/><item drawable="ic_0016"/><item drawable="ic_0017"/><item drawable="ic_0018"/><item drawable="ic_0019"/><item drawable="ic_0020"/><item drawable="ic_0021"/><item drawable="ic_0022"/><item drawable="ic_0023"/><item drawable="ic_0024"/><item drawable="ic_0025"/><item drawable="ic_0026"/><item drawable="ic_0027"/><item drawable="ic_0028"/><item drawable="ic_0029"/><item drawable="ic_0030"/><item drawable="ic_0031"/><item drawable="ic_0032"/><item drawable="ic_0033"/><item drawable="ic_0034"/><item drawable="ic_0035"/><item drawable="ic_0036"/><item drawable="ic_0037"/><item drawable="ic_0038"/><item drawable="ic_0039"/><item drawable="ic_0040"/><item drawable="ic_0041"/><item drawable="ic_0042"/><item drawable="ic_0043"/><item drawable="ic_0044"/><item drawable="ic_0045"/><item drawable="ic_0046"/><item drawable="ic_0047"/><item drawable="ic_0048"/><item drawable="ic_0049"/><item drawable="ic_0050"/><item drawable="ic_0051"/><item drawable="ic_0052"/><item drawable="ic_0053"/><item drawable="ic_0054"/><item drawable="ic_0055"/><item drawable="ic_0056"/><item drawable="ic_0057"/><item drawable="ic_0058"/><item drawable="ic_0059"/><item drawable="ic_0060"/><item drawable="ic_0061"/><item drawable="ic_0062"/><item drawable="ic_0063"/><item drawable="ic_0064"/><item drawable="ic_0065"/><item drawable="ic_0066"/><item drawable="ic_0067"/><item drawable="ic_0068"/><item drawable="ic_0069"/><item drawable="ic_0070"/><item drawable="ic_0071"/><item drawable="ic_0072"/><item drawable="ic_0073"/><item drawable="ic_0074"/><item drawable="ic_0075"/><item drawable="ic_0076"/><item drawable="ic_0077"/><item drawable="ic_0078"/><item drawable="ic_0079"/><item drawable="ic_0080"/><item drawable="ic_0081"/><item drawable="ic_0082"/><item drawable="ic_0083"/><item drawable="ic_0084"/><item drawable="ic_0085"/><item drawable="ic_0086"/><item drawable="ic_0087"/><item drawable="ic_0088"/><item drawable="ic_0089"/><item drawable="ic_0090"/><item drawable="ic_0091"/></resources>

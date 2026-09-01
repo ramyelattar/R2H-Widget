@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content" android:layout_height="wrap_content">
+    <LinearLayout android:id="@+id/widget_date_line" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+        <TextClock android:id="@+id/widget_weekday" android:layout_width="wrap_content" android:layout_height="wrap_content" android:format12Hour="EEEE" android:format24Hour="EEEE" android:includeFontPadding="false" android:fontFamily="cursive" android:textColor="#A7A4B5" android:textSize="11sp" android:textStyle="bold" />
+        <TextClock android:id="@+id/widget_date" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:format12Hour="d MMM yyyy" android:format24Hour="d MMM yyyy" android:includeFontPadding="false" android:fontFamily="cursive" android:textColor="#A7A4B5" android:textSize="11sp" />
+    </LinearLayout>
+    <LinearLayout android:id="@+id/widget_date_line_top" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:visibility="gone">
+        <TextClock android:id="@+id/widget_weekday_top" android:layout_width="wrap_content" android:layout_height="wrap_content" android:format12Hour="EEEE" android:format24Hour="EEEE" android:includeFontPadding="false" android:fontFamily="cursive" android:textColor="#A7A4B5" android:textSize="11sp" android:textStyle="bold" />
+        <TextClock android:id="@+id/widget_date_top" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:format12Hour="d MMM yyyy" android:format24Hour="d MMM yyyy" android:includeFontPadding="false" android:fontFamily="cursive" android:textColor="#A7A4B5" android:textSize="11sp" />
+    </LinearLayout>
+</FrameLayout>
+
