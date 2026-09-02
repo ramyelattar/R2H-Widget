@@ -1,96 +1,193 @@
 # R2H Widget
 
-R2H Widget is an AMOLED-first Android widget studio. The catalog keeps one
-stable product per supported home-screen provider; visual variations are
-configured inside the studio rather than duplicated as catalog entries.
+**R2H Widget** is an Android customization studio focused on polished home-screen widgets, wallpapers, icon experiences, and coordinated themes.
 
-## Catalog
+The application combines native Android widget providers with a Jetpack Compose configuration experience while keeping launcher rendering compatible with Android's `RemoteViews` widget model.
 
-| Product | ID | Provider |
-| --- | --- | --- |
-| Digital Clock | `digital-clock` | `DigitalClockWidgetReceiver` (live `TextClock`) |
-| Analog Clock | `analog-clock` | `AnalogClockWidgetReceiver` (painted dial bitmap) |
-| Battery | `battery` | `BatteryWidgetReceiver` (platform battery broadcasts) |
-| Weather | `weather` | `WeatherWidgetReceiver` (`OpenMeteoWeatherRepository`) |
-| Search | `search` | `SearchWidgetReceiver` |
-| Music Player | `music` | `MusicWidgetReceiver` (media session / notification listener) |
+## Widget Catalog
 
-Gallery sections are Widgets, Icons, Walls, and Themes. The legacy calendar
-provider remains registered only for widgets pinned before the catalog was
-simplified.
+| Widget | Implementation |
+| --- | --- |
+| Digital Clock | Live `TextClock`-based launcher widget |
+| Analog Clock | Locally rendered analog dial |
+| Battery | Device battery state and power events |
+| Weather | Location-aware weather through Open-Meteo |
+| Search | Launcher search widget |
+| Music Player | Media session / notification-based playback state |
 
-## Current implementation
+Legacy widget records remain supported where required for existing pinned instances.
 
-- IMPLEMENTED: six stable catalog products with real RemoteViews providers,
-  per-instance persistence, pin/update/edit flows, and resize callbacks.
-- IMPLEMENTED: Digital Clock studio with typed time/date/layout/background,
-  effects, actions, responsive sizing, presets, and launcher-safe system-font
-  mapping shared by Compose and RemoteViews.
-- IMPLEMENTED: Analog Clock studio and shared painter, including minute-boundary
-  refreshes and real launcher rendering.
-- IMPLEMENTED: Battery studio and event-driven rendering from real device state.
-- IMPLEMENTED: Weather configuration and rendering through Open-Meteo when a
-  location is available; the widget shows an explicit unavailable state when
-  permission, location, network, or source data is unavailable.
-- IMPLEMENTED: Search and Music studios with real launcher providers. Music
-  playback data requires the user to grant notification-listener/media access.
-- IMPLEMENTED: offline Icons, Walls, and Themes surfaces. Icon previews use
-  actual installed app icons plus bundled mappings; wallpapers are applied by
-  `WallpaperManager`; themes persist coordinated icon, wallpaper, clock, and
-  accent selections.
-- IMPLEMENTED: persistent favorites, widget-instance cleanup, legacy codec
-  migration, and stable-ID navigation.
-- LIMITATION: Android launchers own icon-pack application. Nothing Launcher has
-  no verified public direct apply API, so the app reports manual launcher
-  selection instead of claiming that an icon pack was applied.
-- NOT DEVICE VERIFIED in this source/build pass: launcher pin acceptance,
-  wallpaper application, icon-pack selection, and multi-instance visual checks.
+## Features
 
-## Build gates
+### Widget Studio
 
-```text
-.\gradlew.bat :app:testDebugUnitTest --no-daemon --max-workers=1 --console=plain
-.\gradlew.bat :app:assembleDebug --no-daemon --max-workers=1 --console=plain
-.\gradlew.bat :app:lintDebug --no-daemon --max-workers=1 --console=plain
+R2H Widget provides per-widget configuration rather than duplicating every visual variation as a separate catalog item.
+
+Supported configuration areas include:
+
+- Typography
+- Layout
+- Backgrounds
+- Effects
+- Actions
+- Responsive sizing
+- Presets
+- Per-widget-instance persistence
+
+### Digital Clock
+
+- Native launcher time updates through `TextClock`
+- Configurable time and date presentation
+- Responsive layout
+- Presets and visual effects
+- Launcher-safe font mapping
+
+### Analog Clock
+
+- Custom painted dial
+- Minute-boundary updates
+- Time and timezone resynchronization
+- Launcher-safe bitmap rendering
+
+### Battery
+
+- Real device battery state
+- Event-driven updates
+- No unnecessary minute polling
+
+### Weather
+
+- Real Open-Meteo data
+- Location-aware updates
+- Explicit unavailable states when permission, network, location, or source data is missing
+
+### Music
+
+- Reads supported media-session / notification state
+- Playback controls and metadata
+- Requires Android media / notification-listener access where applicable
+
+## Offline Customization
+
+The application includes dedicated customization surfaces for:
+
+- **Icons**
+- **Wallpapers**
+- **Themes**
+- **Favorites**
+
+### Wallpapers
+
+- Local wallpaper catalog
+- Search and category filtering
+- Favorites
+- Preview and inspection
+- Home / Lock / Both targets
+- Application through Android `WallpaperManager`
+
+### Icon Packs
+
+The project contains a bundled icon-pack build pipeline and multiple icon-pack variants.
+
+The Gradle build can package generated icon-pack APKs into the main application so compatible launchers can use the provided icon resources.
+
+> Android launchers control whether an icon pack can be applied directly. Launchers without a supported public apply API may require the user to select the icon pack manually.
+
+### Themes
+
+Themes coordinate multiple customization choices, including:
+
+- Widget / clock presets
+- Icon selections
+- Wallpapers
+- Accent configuration
+
+## Architecture
+
+R2H Widget separates two UI environments:
+
+1. **Jetpack Compose** for the application and configuration studio.
+2. **RemoteViews / AppWidget providers** for launcher widgets.
+
+The two environments share configuration/domain models while rendering through their platform-specific UI systems.
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Platform | Android |
+| Language | Kotlin |
+| App UI | Jetpack Compose |
+| Design | Material 3 |
+| Widgets | Android AppWidget + RemoteViews |
+| Persistence | DataStore |
+| Weather | Open-Meteo |
+| Wallpaper | Android WallpaperManager |
+| Testing | JUnit, Robolectric, Compose UI Test |
+| Build | Gradle Kotlin DSL |
+
+## Android Configuration
+
+- **Minimum Android SDK:** 34
+- **Target SDK:** 37
+- **Compile SDK:** 37
+- **Application ID:** `com.r2h_widget`
+- **Current version:** `1.0`
+
+## Build
+
+### Requirements
+
+- Android Studio
+- Android SDK
+- JDK compatible with the project Gradle toolchain
+
+### Debug Build
+
+```bash
+./gradlew :app:assembleDebug
 ```
 
-## Widget update strategy
+On Windows:
 
-- **Digital Clock** uses Android `TextClock`; the launcher owns the live local
-  time refresh and `updatePeriodMillis` remains disabled.
-- **Analog Clock** paints the dial into a bitmap and schedules one lightweight
-  minute-boundary alarm. Doze may defer an exact tick; the next update catches
-  up. Time-zone, time-set, boot, and launcher update broadcasts resync it.
-- **Battery** reacts to battery and power broadcasts. It does not poll with a
-  minute worker.
-- **Weather** refreshes after location updates and network reads from the
-  Open-Meteo endpoint. Missing permissions/data produce an unavailable state,
-  never fabricated weather.
-- **Music** reads the selected media session/notification snapshot and updates
-  from playback actions and media access events.
+```powershell
+.\gradlew.bat :app:assembleDebug
+```
 
-All providers resolve their typed configuration from the persisted
-`appWidgetId` record before rendering. Compose previews and launcher rendering
-share domain models but do not share a UI tree.
+The application build also prepares the bundled icon-pack payload required by the selected build variant.
 
-## Offline customization
+### Unit Tests
 
-`customization/` contains the independent DataStore-backed selection boundary:
+```bash
+./gradlew :app:testDebugUnitTest
+```
 
-- **Icons**: Graphite Liquid Glass and Neon Liquid Glass. The app renders real
-  installed application icons with the selected surface treatment and parses
-  the classic `appfilter.xml` mapping. Compatible launchers may offer their own
-  import/apply flow; Nothing Launcher remains manual-selection only.
-- **Walls**: local bundled artwork with preview, search/category filtering,
-  favorites, zoom/pan inspection, and Home/Lock/Both `WallpaperManager` apply
-  targets.
-- **Themes**: offline bundles coordinating a clock preset, icon pack, local
-  wallpaper, and app accent. Applying a theme applies the local wallpaper and
-  leaves launcher-owned icon selection explicit.
+### Lint
 
-## Compatibility and scope
+```bash
+./gradlew :app:lintDebug
+```
 
-Legacy digital-clock, battery, weather, and calendar records remain decodable.
-Calendar is retained only for already-pinned instances. Remote Compose is not
-used in production. Billing, cloud sync, AI, ONNX, and remote widget data are
-outside the current offline customization scope.
+## Release Signing
+
+Release signing can be provided locally through environment variables or Gradle properties.
+
+The repository does not need to contain signing passwords or private keys.
+
+## Permissions & Platform Notes
+
+Some features depend on Android platform capabilities:
+
+- Weather requires suitable location access.
+- Music state/control may require notification-listener or media access.
+- Wallpaper changes use Android's wallpaper APIs.
+- Icon-pack activation depends on the installed launcher.
+- Widget pinning is ultimately confirmed by the launcher.
+
+## Repository
+
+[R2H-Widget](https://github.com/ramyelattar/R2H-Widget)
+
+---
+
+**R2H — Native Android customization without unnecessary cloud dependencies.**
